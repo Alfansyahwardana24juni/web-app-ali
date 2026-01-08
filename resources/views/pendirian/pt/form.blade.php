@@ -1089,7 +1089,7 @@
                             <i class="fas fa-exclamation-triangle"></i>
                             <div>
                                 <h3 class="text-lg font-bold mb-2">Informasi Biaya Tambahan KBLI</h3>
-                                <p class="text-sm">Batas Gratis: <span class="font-semibold">25 KBLI</span>
+                                <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span>
                                 </p>
                                 <p class="text-sm">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0
                                         Kode</span></p>
@@ -1218,7 +1218,7 @@
     <script>
         $(document).ready(function() {
             // --- GLOBAL VARIABLES & CONFIGURATION ---
-            const MAX_KBLI_FREE = 25;
+            const MAX_KBLI_FREE = 5;
             const COST_PER_EXCESS = 25000;
             let selectedKBLIs = [];
             let kbliDetailsCache = {};
@@ -1928,9 +1928,10 @@
                         uraian
                     };
                     const isSelected = selectedKBLIs.some(k => k.kbli === kbli);
-                    const btnLabel = isSelected ? 'Dipilih' : 'Pilih';
-                    const btnDisabled = isSelected ? 'disabled' : '';
-                    const btnClass = isSelected ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
+                    const reachedLimit = selectedKBLIs.length >= MAX_KBLI_FREE;
+                    const btnLabel = isSelected ? 'Dipilih' : (reachedLimit ? 'Limit' : 'Pilih');
+                    const btnDisabled = isSelected || (!isSelected && reachedLimit) ? 'disabled' : '';
+                    const btnClass = isSelected || (!isSelected && reachedLimit) ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
                         'bg-blue-600 text-white hover:bg-blue-700';
 
                     const row = $(`
@@ -2170,12 +2171,27 @@
             // --- KBLI SELECTION & REMOVAL ---
             function addKBLI(kbli) {
                 if (!kbliDetailsCache[kbli] || selectedKBLIs.some(k => k.kbli === kbli)) return;
+                if (selectedKBLIs.length >= MAX_KBLI_FREE) {
+                    alert(`Batas pemilihan KBLI adalah ${MAX_KBLI_FREE} item.`);
+                    return;
+                }
                 selectedKBLIs.push(kbliDetailsCache[kbli]);
                 updateSelectedKBLIList();
                 updateFinancialSummary();
                 $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Dipilih').prop('disabled', true)
                     .removeClass('bg-blue-600 text-white hover:bg-blue-700').addClass(
                         'bg-gray-300 text-gray-700 cursor-not-allowed');
+                // Jika sekarang mencapai batas, nonaktifkan tombol 'Pilih' lainnya
+                if (selectedKBLIs.length >= MAX_KBLI_FREE) {
+                    $('.kbli-select-btn').each(function() {
+                        const btnKbli = $(this).data('kbli');
+                        if (!selectedKBLIs.some(k => k.kbli === btnKbli)) {
+                            $(this).text('Limit').prop('disabled', true)
+                                .removeClass('bg-blue-600 text-white hover:bg-blue-700')
+                                .addClass('bg-gray-300 text-gray-700 cursor-not-allowed');
+                        }
+                    });
+                }
                 localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
             }
 
@@ -2186,6 +2202,17 @@
                 $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Pilih').prop('disabled', false)
                     .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed').addClass(
                         'bg-blue-600 text-white hover:bg-blue-700');
+                // Jika jumlah sekarang kurang dari batas, aktifkan kembali tombol 'Pilih' yang belum dipilih
+                if (selectedKBLIs.length < MAX_KBLI_FREE) {
+                    $('.kbli-select-btn').each(function() {
+                        const btnKbli = $(this).data('kbli');
+                        if (!selectedKBLIs.some(k => k.kbli === btnKbli)) {
+                            $(this).text('Pilih').prop('disabled', false)
+                                .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed')
+                                .addClass('bg-blue-600 text-white hover:bg-blue-700');
+                        }
+                    });
+                }
                 localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
             }
 
