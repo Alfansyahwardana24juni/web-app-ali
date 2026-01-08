@@ -3,32 +3,25 @@
 @section('title', 'Pendirian CV')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="id">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pendirian CV</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+<!-- Page head assets (kept inline) -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Google Fonts: Inter & Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
-        rel="stylesheet">
+<!-- Google Fonts: Inter & Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
+<style>
         /* Terapkan font Inter ke seluruh halaman */
         body {
             font-family: 'Inter', sans-serif;
@@ -1089,14 +1082,24 @@
                             <i class="fas fa-exclamation-triangle"></i>
                             <div>
                                 <h3 class="text-lg font-bold mb-2">Informasi Biaya Tambahan KBLI</h3>
-                                <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span>
-                                </p>
-                                <p class="text-sm">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0
-                                        Kode</span></p>
-                                <p class="text-xl font-extrabold mt-2">Biaya Tambahan: <span
-                                        id="total-kbli-charge">Rp0</span></p>
+                                <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span></p>
+
+                                <p class="text-sm">Untuk hingga 5 KBLI, <strong>Akta Notaris</strong> (Rp15.000) <strong>dan</strong> <strong>NIB</strong> (Rp100.000) <em>wajib</em>.</p>
+
+                                <div id="kbli-doc-options" class="mt-2 hidden">
+                                    <p class="text-sm font-semibold mb-1">Pilihan untuk Kelebihan KBLI (&gt;5):</p>
+                                    <label class="inline-flex items-center mr-4"><input type="radio" name="kbli_doc_option_radio" value="akta"> <span class="ml-2">Akta saja (Rp15.000)</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="kbli_doc_option_radio" value="both" checked> <span class="ml-2">Akta + NIB (Rp15.000 + Rp100.000)</span></label>
+                                    <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="">
+                                    <input type="hidden" id="include_akta" name="include_akta" value="0">
+                                    <input type="hidden" id="include_nib" name="include_nib" value="0">
+                                </div>
+
+                                <p class="text-sm mt-2">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0 Kode</span></p>
+                                <p class="text-sm">Rincian: <span id="kbli-cost-breakdown" class="font-semibold">-</span></p>
+                                <p class="text-xl font-extrabold mt-2">Total Biaya Tambahan: <span id="total-kbli-charge">Rp0</span></p>
                             </div>
-                        </div>
+                        </div> 
 
                         <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
 
@@ -1219,7 +1222,12 @@
         $(document).ready(function() {
             // --- GLOBAL VARIABLES & CONFIGURATION ---
             const MAX_KBLI_FREE = 5;
-            const COST_PER_EXCESS = 25000;
+            // Per-excess KBLI charge removed as per business rule
+            const COST_PER_EXCESS = 0;
+            // New: document fees and selection option for KBLI > 5
+            const AKTA_FEE = 15000;
+            const NIB_FEE = 100000;
+            let kbliDocOption = 'both'; // 'akta' or 'both'
             let selectedKBLIs = [];
             let kbliDetailsCache = {};
             let currentKBLIPage = 1;
@@ -1575,59 +1583,7 @@
                 }
             }
 
-            // --- GANTI EVENT LISTENER INI ---
-            $('#pendirian-cv-form').on('submit', function(e) {
-                e.preventDefault();
 
-                // HANYA VALIDASI SAMPAI LANGKAH 4, karena data dikirim dari sana
-                let allValid = true;
-                for (let i = 1; i <= 4; i++) {
-                    if (!validateStep(i)) {
-                        allValid = false;
-                        showStep(i);
-                        updateProgressIndicator(i);
-                        updateNavigationButtons(i);
-                        break;
-                    }
-                }
-
-                if (!allValid) return;
-
-                const submitBtn = $('#next-step-btn');
-                const originalText = submitBtn.html();
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
-
-                const formData = new FormData(this);
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        showToast(
-                            'Pengajuan berhasil dibuat! Anda akan diarahkan ke halaman pembayaran.',
-                            'success');
-                        localStorage.removeItem('selectedKBLIs');
-                        // Arahkan ke halaman pembayaran yang baru
-                        setTimeout(() => {
-                            window.location.href = response.redirect_url;
-                        }, 2000);
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                '<br>');
-                        }
-                        showToast(errorMessage, 'error');
-                        submitBtn.prop('disabled', false).html(originalText);
-                    }
-                });
-            });
 
             function handleNext() {
                 const currentStep = $('.progress-step-sticky.active').data('step');
@@ -1754,6 +1710,16 @@
                         isValid = false;
                     }
 
+                    // Validate document choices based on count
+                    const kbliCount = selectedKBLIs.length;
+                    if (kbliCount > MAX_KBLI_FREE) {
+                        const opt = $('#kbli_doc_option').val();
+                        if (!opt || (opt !== 'akta' && opt !== 'both')) {
+                            showToast('Silakan pilih opsi dokumen untuk kelebihan KBLI (Akta atau Akta + NIB).', 'error');
+                            isValid = false;
+                        }
+                    }
+
                     // Validate bank selection
                     if (!selectedBank) {
                         $('#selected_bank-error').text('Silakan pilih rekanan bank.').show();
@@ -1771,32 +1737,7 @@
                 return isValid;
             }
 
-            function updateSubmissionSummary() {
-                const namaPerusahaan = $('#nama_perusahaan').val();
-                const provinceText = $('#province option:selected').text();
-                const cityText = $('#city option:selected').text();
-                const direkturCount = $('#direktur-container .person-entry').length;
-                const komisarisCount = $('#komisaris-container .person-entry').length;
-                const kbliCount = selectedKBLIs.length;
-                const bankName = selectedBank || 'Belum dipilih';
 
-                let summaryHTML = `
-                <p><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</p>
-                <p><strong>Lokasi:</strong> ${provinceText}, ${cityText}</p>
-                <p><strong>Jumlah Direktur:</strong> ${direkturCount}</p>
-                <p><strong>Jumlah Komisaris:</strong> ${komisarisCount}</p>
-                <p><strong>Jumlah KBLI:</strong> ${kbliCount}</p>
-                <p><strong>Rekanan Bank:</strong> ${bankName}</p>
-            `;
-
-                if (kbliCount > MAX_KBLI_FREE) {
-                    const excessCount = kbliCount - MAX_KBLI_FREE;
-                    const additionalCost = excessCount * COST_PER_EXCESS;
-                    summaryHTML +=
-                        `<p class="text-red-600 mt-2"><strong>Biaya Tambahan KBLI:</strong> Rp${additionalCost.toLocaleString('id-ID')}</p>`;
-                }
-                $('#submission-summary').html(summaryHTML);
-            }
 
             // --- PERSON FORM (DIREKTUR/KOMISARIS) LOGIC ---
             function createPersonTemplate(type, index) {
@@ -1928,10 +1869,9 @@
                         uraian
                     };
                     const isSelected = selectedKBLIs.some(k => k.kbli === kbli);
-                    const reachedLimit = selectedKBLIs.length >= MAX_KBLI_FREE;
-                    const btnLabel = isSelected ? 'Dipilih' : (reachedLimit ? 'Limit' : 'Pilih');
-                    const btnDisabled = isSelected || (!isSelected && reachedLimit) ? 'disabled' : '';
-                    const btnClass = isSelected || (!isSelected && reachedLimit) ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
+                    const btnLabel = isSelected ? 'Dipilih' : 'Pilih';
+                    const btnDisabled = isSelected ? 'disabled' : '';
+                    const btnClass = isSelected ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
                         'bg-blue-600 text-white hover:bg-blue-700';
 
                     const row = $(`
@@ -2171,27 +2111,12 @@
             // --- KBLI SELECTION & REMOVAL ---
             function addKBLI(kbli) {
                 if (!kbliDetailsCache[kbli] || selectedKBLIs.some(k => k.kbli === kbli)) return;
-                if (selectedKBLIs.length >= MAX_KBLI_FREE) {
-                    alert(`Batas pemilihan KBLI adalah ${MAX_KBLI_FREE} item.`);
-                    return;
-                }
                 selectedKBLIs.push(kbliDetailsCache[kbli]);
                 updateSelectedKBLIList();
                 updateFinancialSummary();
                 $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Dipilih').prop('disabled', true)
                     .removeClass('bg-blue-600 text-white hover:bg-blue-700').addClass(
                         'bg-gray-300 text-gray-700 cursor-not-allowed');
-                // Jika sekarang mencapai batas, nonaktifkan tombol 'Pilih' lainnya
-                if (selectedKBLIs.length >= MAX_KBLI_FREE) {
-                    $('.kbli-select-btn').each(function() {
-                        const btnKbli = $(this).data('kbli');
-                        if (!selectedKBLIs.some(k => k.kbli === btnKbli)) {
-                            $(this).text('Limit').prop('disabled', true)
-                                .removeClass('bg-blue-600 text-white hover:bg-blue-700')
-                                .addClass('bg-gray-300 text-gray-700 cursor-not-allowed');
-                        }
-                    });
-                }
                 localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
             }
 
@@ -2252,11 +2177,108 @@
                 removeKBLI(kbli);
             });
 
+            // Document option radio change
+            $(document).on('change', 'input[name="kbli_doc_option_radio"]', function() {
+                const val = $(this).val();
+                $('#kbli_doc_option').val(val);
+                kbliDocOption = val;
+                updateFinancialSummary();
+            });
+
+            // Update submission summary to include doc costs
+            function updateSubmissionSummary() {
+                const namaPerusahaan = $('#nama_perusahaan').val();
+                const provinceText = $('#province option:selected').text();
+                const cityText = $('#city option:selected').text();
+                const direkturCount = $('#direktur-container .person-entry').length;
+                const komisarisCount = $('#komisaris-container .person-entry').length;
+                const kbliCount = selectedKBLIs.length;
+                const bankName = selectedBank || 'Belum dipilih';
+
+                let summaryHTML = `
+                <p><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</p>
+                <p><strong>Lokasi:</strong> ${provinceText}, ${cityText}</p>
+                <p><strong>Jumlah Direktur:</strong> ${direkturCount}</p>
+                <p><strong>Jumlah Komisaris:</strong> ${komisarisCount}</p>
+                <p><strong>Jumlah KBLI:</strong> ${kbliCount}</p>
+                <p><strong>Rekanan Bank:</strong> ${bankName}</p>
+            `;
+
+                if (kbliCount > 0) {
+                    const excessCount = Math.max(0, kbliCount - MAX_KBLI_FREE);
+
+                    // First 5 KBLI are free (Rp0). Charges apply only when count > MAX_KBLI_FREE
+                    if (kbliCount <= MAX_KBLI_FREE) {
+                        // No additional charges
+                        summaryHTML += `<p class="mt-2"><strong>Rincian Biaya:</strong> Rp0 (hingga ${MAX_KBLI_FREE} KBLI gratis)</p>`;
+                        summaryHTML += `<p class="text-xl font-extrabold mt-2"><strong>Total Biaya Tambahan:</strong> Rp0</p>`;
+                    } else {
+                        const docOption = $('#kbli_doc_option').val() || 'both';
+                        const perUnit = (docOption === 'akta') ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
+                        let parts = [];
+                        if (docOption === 'akta') {
+                            parts.push(`Akta Rp${AKTA_FEE.toLocaleString('id-ID')}`);
+                        } else {
+                            parts.push(`Akta Rp${AKTA_FEE.toLocaleString('id-ID')}`, `NIB Rp${NIB_FEE.toLocaleString('id-ID')}`);
+                        }
+
+                        const totalCharge = excessCount * perUnit;
+                        summaryHTML += `<p class="mt-2"><strong>Rincian Biaya per Unit:</strong> ${parts.join(', ')}</p>`;
+                        summaryHTML += `<p class="mt-1">Kelebihan: <strong>${excessCount} × Rp${perUnit.toLocaleString('id-ID')} = Rp${totalCharge.toLocaleString('id-ID')}</strong></p>`;
+                        summaryHTML += `<p class="text-xl font-extrabold mt-2"><strong>Total Biaya Tambahan:</strong> Rp${totalCharge.toLocaleString('id-ID')}</p>`;
+                    }
+                }
+                $('#submission-summary').html(summaryHTML);
+            }
+
             function updateFinancialSummary() {
                 const count = selectedKBLIs.length;
                 const excessCount = Math.max(0, count - MAX_KBLI_FREE);
-                const totalCharge = excessCount * COST_PER_EXCESS;
+                let includeAkta = false;
+                let includeNib = false;
+
+                if (count === 0) {
+                    $('#kbli-doc-options').addClass('hidden');
+                    $('#kbli_doc_option').val('');
+                    $('#include_akta').val(0);
+                    $('#include_nib').val(0);
+                } else if (count <= MAX_KBLI_FREE) {
+                    // First 5 KBLI are free (Rp0)
+                    $('#kbli-doc-options').addClass('hidden');
+                    $('#kbli_doc_option').val('');
+                    includeAkta = false;
+                    includeNib = false;
+                    $('#include_akta').val(0);
+                    $('#include_nib').val(0);
+                } else {
+                    // More than free limit: show options and apply charges
+                    $('#kbli-doc-options').removeClass('hidden');
+                    let opt = $('#kbli_doc_option').val();
+                    if (!opt) {
+                        opt = kbliDocOption || 'both';
+                        $('#kbli_doc_option').val(opt);
+                        $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
+                    } else {
+                        $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
+                    }
+                    kbliDocOption = opt;
+                    includeAkta = true;
+                    includeNib = (opt === 'both');
+                    $('#include_akta').val(includeAkta ? 1 : 0);
+                    $('#include_nib').val(includeNib ? 1 : 0);
+                }
+
+                const perUnit = (includeAkta ? AKTA_FEE : 0) + (includeNib ? NIB_FEE : 0);
+                const totalCharge = (count <= MAX_KBLI_FREE) ? 0 : (excessCount * perUnit);
+
                 $('#excess-kbli-count').text(`${excessCount} Kode`);
+                let breakdownParts = [];
+                if (count > MAX_KBLI_FREE) {
+                    if (includeAkta) breakdownParts.push(`Akta: Rp${AKTA_FEE.toLocaleString('id-ID')}`);
+                    if (includeNib) breakdownParts.push(`NIB: Rp${NIB_FEE.toLocaleString('id-ID')}`);
+
+                }
+                $('#kbli-cost-breakdown').text(breakdownParts.join(', ') || '-');
                 $('#total-kbli-charge').text(`Rp${totalCharge.toLocaleString('id-ID')}`);
             }
 
@@ -2373,7 +2395,4 @@
             initializeApp();
         });
     </script>
-</body>
-
-</html>
 @endsection
