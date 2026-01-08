@@ -2,52 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kbli; // Perbaikan: gunakan nama model yang konsisten
+use App\Models\Kbli;
 use Illuminate\Http\Request;
 
-class KbLiController extends Controller
+class KbliController extends Controller
 {
     /**
-     * Endpoint API untuk pencarian KBLI berdasarkan kolom:
-     * - kbli (kode)
-     * - judul
-     * - uraian
+     * Tampilkan halaman form pendirian PT
+     */
+    public function index()
+    {
+        // Load awal (misalnya 25 data pertama)
+        $kblis = Kbli::orderBy('KODE')->paginate(25);
+
+        return view('pendirian.pt.form', compact('kblis'));
+    }
+
+    /**
+     * Endpoint untuk pencarian KBLI (AJAX)
+     * Supports query (string) and per_page (int) parameters and returns
+     * paginated results with fields: kbli, judul, uraian
      */
     public function search(Request $request)
     {
-        $query = $request->input('query');
-        $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 25);
+        $search = $request->input('query', '');
+        $perPage = (int) $request->input('per_page', 25);
 
-        // Query pencarian sesuai struktur tabel di phpMyAdmin
         $kbliQuery = Kbli::query();
 
-        // Jika query kosong atau 'all', tampilkan semua data
-        if (empty($query) || $query === 'all') {
-            // Tidak perlu filter, ambil semua data
-        } else if (strlen($query) >= 2) {
-            // Filter berdasarkan query
-            $kbliQuery->where(function ($q) use ($query) {
-                $q->where('kbli', 'like', $query . '%')
-                    ->orWhere('judul', 'like', '%' . $query . '%')
-                    ->orWhere('uraian', 'like', '%' . $query . '%');
-            });
-        } else {
-            // Jika query terlalu pendek, kembalikan array kosong
-            return response()->json([
-                'data' => [],
-                'current_page' => 1,
-                'last_page' => 1,
-                'per_page' => $perPage,
-                'total' => 0,
-                'from' => 0,
-                'to' => 0,
-            ]);
+        if (!empty($search)) {
+            $kbliQuery->where('KODE', 'like', $search . '%')
+                ->orWhere('JUDUL', 'like', '%' . $search . '%')
+                ->orWhere('URAIAN', 'like', '%' . $search . '%');
         }
 
-        // Dapatkan hasil dengan pagination
-        $results = $kbliQuery->select('kbli', 'judul', 'uraian', 'id_resiko', 'kd_resiko')
-            ->orderBy('kbli', 'asc')
+        $results = $kbliQuery
+            ->select('KODE as kbli', 'JUDUL as judul', 'URAIAN as uraian')
+            ->orderBy('KODE')
             ->paginate($perPage);
 
         return response()->json($results);

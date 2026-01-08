@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Kbli;
 
 class PendirianPTController extends Controller
 {
@@ -30,7 +31,10 @@ class PendirianPTController extends Controller
 
         sort($cities);
 
-        return view('pendirian.pt.form', compact('cities'));
+        // Load initial KBLI data to render server-side table and avoid undefined variable
+        $kblis = Kbli::orderBy('KODE')->paginate(25);
+
+        return view('pendirian.pt.form', compact('cities', 'kblis'));
     }
 
     public function store(Request $request)

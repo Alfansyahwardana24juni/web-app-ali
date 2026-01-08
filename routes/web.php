@@ -43,7 +43,8 @@ Route::prefix('pendirian')->group(function () {
     Route::get('/pt/form', [PendirianPTController::class, 'create'])->name('pendirian.pt.form');
     Route::post('/pt/form', [PendirianPTController::class, 'store'])->name('pendirian.pt.store');
 });
-Route::get('/api/kbli/search', [KbLiController::class, 'search'])->name('kbli.search');
+Route::get('/kbli/search', [KbliController::class, 'search'])->name('kbli.search');
+Route::get('/api/kbli/search', [KbliController::class, 'search'])->name('kbli.search.api');
 
 Route::get('/provinces', [DependantDropdownController::class, 'provinces'])->name('provinces');
 Route::get('/cities', [DependantDropdownController::class, 'cities'])->name('cities');
