@@ -1158,8 +1158,7 @@
                                 <i class="fas fa-university"></i>
                                 Pilih Rekanan Bank
                             </h3>
-                            <p class="text-sm text-gray-600 mb-4">Pilih salah satu rekanan bank kami untuk proses
-                                pembayaran.</p>
+                            <p class="text-sm text-gray-600 mb-4">Silakan pilih salah satu bank rekanan kami untuk proses pembukaan rekening perusahaan anda.</p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bank-options">
                                 <!-- Bank options will be populated by JavaScript based on location -->
