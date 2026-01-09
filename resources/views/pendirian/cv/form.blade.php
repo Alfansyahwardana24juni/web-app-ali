@@ -1169,49 +1169,75 @@
                         </div>
                     </div>
 
-                    <!-- Step 5: Selesai & Upload Bukti Bayar -->
+                    <!-- Step 5: Upload Bukti Pembayaran -->
                     <div class="form-section hidden" data-step="5">
                         <h3 class="form-section-title">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                            Upload Bukti Pembayaran
+                            <i class="fas fa-credit-card"></i>
+                            Pembayaran & Upload Bukti
                         </h3>
 
-                        <div class="payment-proof-container" id="payment-proof-container">
-                            <div class="mb-4">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                        <!-- Payment Summary -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                            <h4 class="text-lg font-semibold text-blue-900 mb-4">Ringkasan Pembayaran</h4>
+                            <div id="payment-summary" class="text-blue-800 space-y-2">
+                                <!-- Summary will be filled by JavaScript -->
                             </div>
-                            <p class="text-sm text-gray-600 mb-2">Klik untuk upload atau seret file ke sini</p>
-                            <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 5MB)</p>
-                            <input type="file" id="payment_proof" name="payment_proof" class="hidden"
-                                accept="image/*,.pdf">
-                            <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn">Pilih
-                                File</button>
                         </div>
 
-                        <div id="payment-proof-preview" class="mt-4 hidden">
-                            <div
-                                class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="font-medium text-gray-900" id="payment-proof-name">File berhasil
-                                            diupload</p>
-                                        <p class="text-sm text-gray-500" id="payment-proof-size">0 KB</p>
-                                    </div>
+                        <!-- Payment Instructions -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+                            <h4 class="font-semibold text-amber-900 mb-3 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-amber-600"></i>
+                                Instruksi Pembayaran
+                            </h4>
+                            <ol class="text-sm text-amber-800 space-y-2 list-decimal list-inside">
+                                <li>Transfer biaya sesuai nominal di atas ke rekening yang telah ditentukan</li>
+                                <li>Simpan bukti transfer (screenshot atau cetak) sebagai bukti pembayaran</li>
+                                <li>Upload bukti pembayaran di bawah ini dalam format JPG, PNG, atau PDF</li>
+                                <li>Klik tombol "Ajukan Pendirian" untuk mengirimkan pengajuan Anda</li>
+                            </ol>
+                        </div>
+
+                        <!-- Payment Proof Upload -->
+                        <div class="form-group">
+                            <label class="form-label required">Bukti Pembayaran</label>
+                            <div class="payment-proof-container" id="payment-proof-container">
+                                <div class="mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
                                 </div>
-                                <button type="button" class="text-red-500 hover:text-red-700" id="remove-payment-proof">
-                                    <i class="fas fa-times-circle text-xl"></i>
+                                <p class="text-sm text-gray-600 mb-2">Klik untuk upload atau seret file ke sini</p>
+                                <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 5MB)</p>
+                                <input type="file" id="payment_proof" name="payment_proof" class="hidden"
+                                    accept="image/*,.pdf">
+                                <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn">
+                                    <i class="fas fa-upload mr-2"></i>Pilih File
                                 </button>
                             </div>
+
+                            <div id="payment-proof-preview" class="mt-4 hidden">
+                                <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
+                                        <div>
+                                            <p class="font-medium text-gray-900" id="payment-proof-name">File berhasil diupload</p>
+                                            <p class="text-sm text-gray-500" id="payment-proof-size">0 KB</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="text-red-500 hover:text-red-700" id="remove-payment-proof">
+                                        <i class="fas fa-times-circle text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="error-message" id="payment_proof-error"></div>
                         </div>
 
-                        <div class="error-message" id="payment_proof-error"></div>
-
-                        <div class="info-box">
-                            <i class="fas fa-info-circle"></i>
+                        <!-- Submission Summary -->
+                        <div class="info-box mt-6">
+                            <i class="fas fa-list-check"></i>
                             <div>
                                 <h4 class="text-md font-medium mb-2">Ringkasan Pengajuan</h4>
-                                <div id="submission-summary" class="text-sm">
+                                <div id="submission-summary" class="text-sm space-y-1">
                                     <!-- Ringkasan akan diisi oleh JavaScript -->
                                 </div>
                             </div>
@@ -1599,7 +1625,10 @@
             function showStep(step) {
                 $('.form-section').addClass('hidden');
                 $(`.form-section[data-step="${step}"]`).removeClass('hidden');
-                if (step === 5) updateSubmissionSummary();
+                if (step === 5) {
+                    updateSubmissionSummary();
+                    updatePaymentSummary();
+                }
                 if (step === 4) updateBankOptions();
             }
 
@@ -1612,20 +1641,19 @@
                 $(`.progress-step-sticky[data-step="${step}"]`).addClass('active');
             }
 
-            // --- GANTI FUNGSI INI ---
+            // --- UPDATE NAVIGATION BUTTONS ---
             function updateNavigationButtons(step) {
                 const prevBtn = $('#prev-step-btn');
                 const nextBtn = $('#next-step-btn');
 
                 prevBtn.prop('disabled', step === 1);
 
-                // PERUBAHAN UTAMA: Langkah 4 sekarang adalah titik submit
-                if (step === 4) {
+                // Step 5 adalah langkah pembayaran (langkah terakhir sebelum submit)
+                if (step === 5) {
                     // Ubah tombol menjadi tombol submit
-                    nextBtn.html('Ajukan Pendirian<i class="fas fa-check ml-2"></i>').attr('type', 'submit').off(
-                        'click');
+                    nextBtn.html('<i class="fas fa-paper-plane mr-2"></i>Ajukan Pendirian').attr('type', 'submit').off('click');
                 } else {
-                    // Logika normal untuk step 1, 2, 3
+                    // Logika normal untuk step 1, 2, 3, 4
                     nextBtn.html('Lanjutkan<i class="fas fa-arrow-right ml-2"></i>').attr('type', 'button').off(
                         'click').on('click', handleNext);
                 }
@@ -1778,6 +1806,7 @@
                     const paymentProof = $('#payment_proof').val();
                     if (!paymentProof) {
                         $('#payment_proof-error').text('Silakan upload bukti pembayaran.').show();
+                        showToast('Silakan upload bukti pembayaran untuk melanjutkan.', 'error');
                         isValid = false;
                     }
                 }
@@ -2233,6 +2262,65 @@
                 updateFinancialSummary();
             });
 
+            // Update payment summary with cost details
+            function updatePaymentSummary() {
+                const paymentSummaryDiv = $('#payment-summary');
+                const kbliCount = selectedKBLIs.length;
+                const excessCount = Math.max(0, kbliCount - MAX_KBLI_FREE);
+                
+                let summaryHTML = '';
+                
+                if (kbliCount === 0) {
+                    summaryHTML = '<p class="text-amber-600">⚠️ Tidak ada KBLI yang dipilih</p>';
+                } else if (kbliCount <= MAX_KBLI_FREE) {
+                    summaryHTML = `
+                        <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                            <span>Layanan Dasar (hingga ${MAX_KBLI_FREE} KBLI)</span>
+                            <strong>Rp0</strong>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-blue-200">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Total Biaya Tambahan</span>
+                                <strong class="text-lg text-blue-900">Rp0</strong>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const docOption = $('#kbli_doc_option').val() || 'both';
+                    let costPerUnit = 0;
+                    let costDetails = '';
+                    
+                    if (docOption === 'akta') {
+                        costPerUnit = AKTA_FEE;
+                        costDetails = `Akta untuk ${excessCount} KBLI`;
+                    } else {
+                        costPerUnit = AKTA_FEE + NIB_FEE;
+                        costDetails = `Akta + NIB untuk ${excessCount} KBLI`;
+                    }
+                    
+                    const totalCharge = excessCount * costPerUnit;
+                    
+                    summaryHTML = `
+                        <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                            <span>Layanan Dasar (${MAX_KBLI_FREE} KBLI pertama)</span>
+                            <strong>Rp0</strong>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                            <span>${costDetails}</span>
+                            <strong>Rp${totalCharge.toLocaleString('id-ID')}</strong>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-blue-200">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Total Biaya Tambahan</span>
+                                <strong class="text-lg text-blue-900">Rp${totalCharge.toLocaleString('id-ID')}</strong>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                paymentSummaryDiv.html(summaryHTML);
+            }
+
             // Update submission summary to include doc costs
             function updateSubmissionSummary() {
                 const namaPerusahaan = $('#nama_perusahaan').val();
@@ -2328,6 +2416,11 @@
                 }
                 $('#kbli-cost-breakdown').text(breakdownParts.join(', ') || '-');
                 $('#total-kbli-charge').text(`Rp${totalCharge.toLocaleString('id-ID')}`);
+                
+                // Update payment summary jika sudah di step 5
+                if ($('.form-section[data-step="5"]').is(':not(.hidden)')) {
+                    updatePaymentSummary();
+                }
             }
 
             function showKBLIDetailModal(kbli) {
