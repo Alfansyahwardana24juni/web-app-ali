@@ -1,15 +1,10 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Pendirian PT')
+@section('title', 'Pendirian pt')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="id">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pendirian PT</title>
+    <!-- Page head assets (kept inline) -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Google Fonts: Inter & Poppins -->
@@ -812,1659 +807,1655 @@
         }
 
         @media (max-width: 640px) {
-            .form-container { padding: 1rem; }
-            .form-header h2 { font-size: 1.25rem; }
-            .form-header p { font-size: 0.9rem; }
-            .form-body .grid { grid-template-columns: 1fr !important; }
-            .form-input { width: 100%; }
-            .progress-sticky-bar { left: 0; transform: none; border-radius: 0; max-width: none; padding: 0.75rem 1rem; }
-            .progress-step-sticky-label { display: none; }
-            .kbli-table th, .kbli-table td { padding: 0.5rem; font-size: 0.8rem; }
-            .kbli-table .col-kode { width: 10%; }
-            .kbli-table .col-judul { width: 18%; }
-            .kbli-table .col-uraian { width: 62%; }
-            .kbli-table .col-aksi { width: 10%; }
-            .overflow-x-auto { -webkit-overflow-scrolling: touch; }
-            .bank-option { padding: 1rem; }
-            .bank-option .bank-logo { height: 2.5rem; }
-            #bank-options { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- Container utama diubah untuk full width dan diberi wrapper -->
-    <div class="main-content-wrapper">
-        <div class="form-container">
-            <!-- Header -->
-            <div class="form-header">
-                <h2>Form Pendirian PT</h2>
-                <p>Lengkapi formulir berikut untuk mengajukan pendirian PT</p>
-            </div>
-
-            <!-- Body -->
-            <div class="form-body">
-                @if(session('success'))
-                <div class="success-box">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <span class="block sm:inline">{{ session('success') }}</span>
-                    </div>
-                </div>
-                @endif
-
-                <!-- Progress Indicator Lama ( disembunyikan via CSS ) -->
-                <div class="progress-indicator mb-8">
-                    <div class="progress-step active" data-step="1">
-                        <div class="progress-step-circle">1</div>
-                        <div class="progress-step-label">Informasi</div>
-                    </div>
-                    <div class="progress-step" data-step="2">
-                        <div class="progress-step-circle">2</div>
-                        <div class="progress-step-label">Direktur</div>
-                    </div>
-                    <div class="progress-step" data-step="3">
-                        <div class="progress-step-circle">3</div>
-                        <div class="progress-step-label">Komisaris</div>
-                    </div>
-                    <div class="progress-step" data-step="4">
-                        <div class="progress-step-circle">4</div>
-                        <div class="progress-step-label">KBLI & Bank</div>
-                    </div>
-                    <div class="progress-step" data-step="5">
-                        <div class="progress-step-circle">5</div>
-                        <div class="progress-step-label">Pembayaran</div>
-                    </div>
-                </div>
-
-                <form action="{{ route('pendirian.pt.store') }}" method="POST" enctype="multipart/form-data"
-                    id="pendirian-PT-form">
-                    @csrf
-                    <!-- Step 1: Informasi Dasar -->
-                    <div class="form-section" data-step="1">
-                        <h3 class="form-section-title">
-                            <i class="fas fa-building"></i>
-                            Informasi Dasar Perusahaan
-                        </h3>
-
-                        <div class="form-group">
-                            <label for="nama_perusahaan" class="form-label required">Nama Perusahaan</label>
-                            <input type="text" class="form-input" id="nama_perusahaan" name="nama_perusahaan" required>
-                            <p class="form-help">Minimal 2 suku kata.</p>
-                            <div class="error-message" id="nama_perusahaan-error"></div>
-                        </div>
-
-                        <!-- Lokasi Section -->
-                        <div class="border-t pt-4 mt-4">
-                            <h4 class="text-md font-medium text-gray-900 mb-4 flex items-center">
-                                <i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i>
-                                Alamat Lengkap Perusahaan
-                            </h4>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="form-group">
-                                    <label for="province" class="form-label required">Provinsi</label>
-                                    <select class="form-input" id="province" name="province" required>
-                                        <option value="">-- Pilih Provinsi --</option>
-                                    </select>
-                                    <div class="error-message" id="province-error"></div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="city" class="form-label required">Kota/Kabupaten</label>
-                                    <select class="form-input" id="city" name="city" required disabled>
-                                        <option value="">-- Pilih Kota --</option>
-                                    </select>
-                                    <div class="error-message" id="city-error"></div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="district" class="form-label required">Kecamatan</label>
-                                    <select class="form-input" id="district" name="district" required disabled>
-                                        <option value="">-- Pilih Kecamatan --</option>
-                                    </select>
-                                    <div class="error-message" id="district-error"></div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="village" class="form-label required">Desa/Kelurahan</label>
-                                    <select class="form-input" id="village" name="village" required disabled>
-                                        <option value="">-- Pilih Desa --</option>
-                                    </select>
-                                    <div class="error-message" id="village-error"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mt-4">
-                                <label for="alamat_lengkap" class="form-label required">Alamat Lengkap</label>
-                                <textarea class="form-input" id="alamat_lengkap" name="alamat_lengkap" rows="3" required
-                                    placeholder="Jalan, nomor rumah, RT/RW, dll."></textarea>
-                                <div class="error-message" id="alamat_lengkap-error"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="kode_pos" class="form-label required">Kode Pos</label>
-                                <input type="text" class="form-input" id="kode_pos" name="kode_pos" required
-                                    placeholder="Contoh: 12345">
-                                <div class="error-message" id="kode_pos-error"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Direktur -->
-                    <div class="form-section hidden" data-step="2">
-                        <h3 class="form-section-title">
-                            <i class="fas fa-user-tie"></i>
-                            Informasi Direktur
-                        </h3>
-                        <p class="text-sm text-gray-600 mb-4">Tambahkan informasi lengkap untuk setiap direktur
-                            perusahaan.</p>
-
-                        <div id="direktur-container" class="space-y-4">
-                            <!-- Direktur awal akan dirender oleh JS -->
-                        </div>
-
-                        <button type="button" class="btn btn-secondary btn-sm mt-4" id="add-direktur">
-                            <i class="fas fa-plus mr-2"></i>
-                            Tambah Direktur
-                        </button>
-                    </div>
-
-                    <!-- Step 3: Komisaris -->
-                    <div class="form-section hidden" data-step="3">
-                        <h3 class="form-section-title">
-                            <i class="fas fa-users"></i>
-                            Informasi Komisaris
-                        </h3>
-                        <p class="text-sm text-gray-600 mb-4">Tambahkan informasi lengkap untuk setiap komisaris
-                            perusahaan.</p>
-
-                        <div id="komisaris-container" class="space-y-4">
-                            <!-- Komisaris awal akan dirender oleh JS -->
-                        </div>
-
-                        <button type="button" class="btn btn-secondary btn-sm mt-4" id="add-komisaris">
-                            <i class="fas fa-plus mr-2"></i>
-                            Tambah Komisaris
-                        </button>
-                    </div>
-
-                    <!-- Step 4: KBLI & Rekanan Bank -->
-                    <div class="form-section hidden" data-step="4">
-                        <h3 class="form-section-title">
-                            <i class="fas fa-list-alt"></i>
-                            KBLI (Klasifikasi Baku Lapangan Usaha Indonesia)
-                        </h3>
-                        <p class="text-sm text-gray-600 mb-4">Pilih KBLI yang sesuai dengan bidang usaha Anda.</p>
-
-                        <div>
-                            <div class="mb-4">
-                                <label for="kbli-search-input" class="form-label">Cari KBLI</label>
-                                <div class="search-container">
-                                    <input type="text" id="kbli-search-input" class="form-input pl-10"
-                                        placeholder="Cari berdasarkan kode, judul, atau uraian (min. 3 karakter)...">
-                                    <i
-                                        class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    <div class="search-suggestions" id="kbli-search-suggestions"></div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
-                                <div class="flex items-center space-x-2">
-                                    <label for="kbli-per-page" class="text-sm text-gray-700">Tampilkan</label>
-                                    <select id="kbli-per-page" class="form-input w-auto">
-                                        <option value="10">10</option>
-                                        <option value="25" selected>25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                    <span class="text-sm text-gray-700">hasil</span>
-                                </div>
-                                <div id="kbli-search-summary" class="text-sm text-gray-600">Menampilkan 0 hingga 0 dari
-                                    0 hasil</div>
-                            </div>
-
-                            <div class="overflow-x-auto mb-4">
-                                <table class="kbli-table">
-                                    <thead>
-                                        <tr>
-                                            <th class="col-kode cursor-pointer hover:bg-gray-100" id="sort-kode">
-                                                <div class="flex items-center space-x-1">
-                                                    <span>KODE</span>
-                                                    <span class="text-xs">↑↓</span>
-                                                </div>
-                                            </th>
-                                            <th class="col-judul cursor-pointer hover:bg-gray-100 kbli-detail-trigger"
-                                                id="sort-judul">
-                                                <div class="flex items-center space-x-1">
-                                                    <span>JUDUL</span>
-                                                    <span class="text-xs">↑↓</span>
-                                                </div>
-                                            </th>
-                                            <th class="col-uraian">URAIAN</th>
-                                            <th class="col-aksi">AKSI</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="kbli-results" class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td colspan="4" class="py-4 text-center text-gray-500" id="kbli-no-data">
-                                                Memuat data KBLI...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div id="kbli-pagination" class="flex justify-center mt-4"></div>
-                        </div>
-
-                        <div class="mt-6">
-                            <h4 class="text-md font-medium text-gray-900 mb-2 flex items-center">
-                                <i class="fas fa-check-circle mr-2 text-green-500"></i>
-                                KBLI yang Dipilih (<span id="selected-kbli-count">0</span>)
-                            </h4>
-                            <div class="overflow-x-auto">
-                                <table class="kbli-table">
-                                    <thead class="bg-blue-50">
-                                        <tr>
-                                            <th class="col-kode">NO</th>
-                                            <th class="col-kode">KODE</th>
-                                            <th class="col-judul">JUDUL</th>
-                                            <th class="col-uraian">URAIAN</th>
-                                            <th class="col-aksi">HAPUS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="selected-kbli-body" class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td colspan="5" class="py-4 text-center text-gray-500">Belum ada KBLI yang
-                                                dipilih.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="warning-box">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h3 class="text-lg font-bold mb-2">Informasi Biaya Tambahan KBLI</h3>
-                                <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span></p>
-
-                                <p class="text-sm">Untuk hingga 5 KBLI, <strong>Akta Notaris</strong> (Rp15.000) <strong>dan</strong> <strong>NIB</strong> (Rp100.000) <em>wajib</em>.</p>
-
-                                <div id="kbli-doc-options" class="mt-2 hidden">
-                                    <p class="text-sm font-semibold mb-1">Pilihan untuk Kelebihan KBLI (&gt;5):</p>
-                                    <label class="inline-flex items-center mr-4"><input type="radio" name="kbli_doc_option_radio" value="akta"> <span class="ml-2">Akta saja (Rp15.000)</span></label>
-                                    <label class="inline-flex items-center"><input type="radio" name="kbli_doc_option_radio" value="both" checked> <span class="ml-2">Akta + NIB (Rp15.000 + Rp100.000)</span></label>
-                                    <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="both">
-                                    <input type="hidden" id="include_akta" name="include_akta" value="1">
-                                    <input type="hidden" id="include_nib" name="include_nib" value="1">
-                                </div>
-
-                                <p class="text-sm mt-2">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0 Kode</span></p>
-                                <p class="text-sm">Rincian: <span id="kbli-cost-breakdown" class="font-semibold">-</span></p>
-                                <p class="text-xl font-extrabold mt-2">Total Biaya Tambahan: <span id="total-kbli-charge">Rp0</span></p>
-                            </div>
-                        </div> 
-
-                        <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
-
-                        <!-- Rekanan Bank Section -->
-                        <div class="mt-8 border-t pt-6">
-                            <h3 class="form-section-title">
-                                <i class="fas fa-university"></i>
-                                Pilih Rekanan Bank
-                            </h3>
-                            <p class="text-sm text-gray-600 mb-4">Pilih salah satu rekanan bank kami untuk proses
-                                pembayaran.</p>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bank-options">
-                                <!-- Bank options will be populated by JavaScript based on location -->
-                            </div>
-
-                            <input type="hidden" name="selected_bank" id="selected_bank" value="">
-                            <div class="error-message" id="selected_bank-error"></div>
-                        </div>
-                    </div>
-
-                    <!-- Step 5: Selesai & Upload Bukti Bayar -->
-                    <div class="form-section hidden" data-step="5">
-                        <h3 class="form-section-title">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                            Upload Bukti Pembayaran
-                        </h3>
-
-                        <div class="payment-proof-container" id="payment-proof-container">
-                            <div class="mb-4">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-2">Klik untuk upload atau seret file ke sini</p>
-                            <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 5MB)</p>
-                            <input type="file" id="payment_proof" name="payment_proof" class="hidden"
-                                accept="image/*,.pdf">
-                            <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn">Pilih
-                                File</button>
-                        </div>
-
-                        <div id="payment-proof-preview" class="mt-4 hidden">
-                            <div
-                                class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
-                                    <div>
-                                        <p class="font-medium text-gray-900" id="payment-proof-name">File berhasil
-                                            diupload</p>
-                                        <p class="text-sm text-gray-500" id="payment-proof-size">0 KB</p>
-                                    </div>
-                                </div>
-                                <button type="button" class="text-red-500 hover:text-red-700" id="remove-payment-proof">
-                                    <i class="fas fa-times-circle text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="error-message" id="payment_proof-error"></div>
-
-                        <div class="info-box">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <h4 class="text-md font-medium mb-2">Ringkasan Pengajuan</h4>
-                                <div id="submission-summary" class="text-sm">
-                                    <!-- Ringkasan akan diisi oleh JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="progress-sticky-bar">
-        <div class="progress-sticky-content">
-            <button type="button" id="prev-step-btn" class="btn btn-secondary">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Kembali
-            </button>
-
-            <div class="progress-indicator-sticky-container">
-                <div class="progress-indicator-sticky">
-                    <div class="progress-step-sticky active" data-step="1">
-                        <div class="progress-step-sticky-circle">1</div>
-                        <div class="progress-step-sticky-label">Informasi</div>
-                    </div>
-                    <div class="progress-step-sticky" data-step="2">
-                        <div class="progress-step-sticky-circle">2</div>
-                        <div class="progress-step-sticky-label">Direktur</div>
-                    </div>
-                    <div class="progress-step-sticky" data-step="3">
-                        <div class="progress-step-sticky-circle">3</div>
-                        <div class="progress-step-sticky-label">Komisaris</div>
-                    </div>
-                    <div class="progress-step-sticky" data-step="4">
-                        <div class="progress-step-sticky-circle">4</div>
-                        <div class="progress-step-sticky-label">KBLI & Bank</div>
-                    </div>
-                    <div class="progress-step-sticky" data-step="5">
-                        <div class="progress-step-sticky-circle">5</div>
-                        <div class="progress-step-sticky-label">Pembayaran</div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="button" id="next-step-btn" class="btn btn-primary">
-                Lanjutkan
-                <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            // --- GLOBAL VARIABLES & CONFIGURATION ---
-            const MAX_KBLI_FREE = 5;
-            // Per-excess KBLI charge removed as per business rule
-            const COST_PER_EXCESS = 0;
-            // New: document fees and selection option for KBLI > 5
-            const AKTA_FEE = 15000;
-            const NIB_FEE = 100000;
-            let kbliDocOption = 'both'; // 'akta' or 'both'
-            let selectedKBLIs = [];
-            let kbliDetailsCache = {};
-            let currentKBLIPage = 1;
-            let lastKBLISearchQuery = '';
-            let selectedBank = '';
-            let searchSuggestions = [];
-            let activeSuggestionIndex = -1;
-
-            // --- INITIALIZATION ---
-            function initializeApp() {
-                // Load saved KBLI from localStorage
-                const savedKBLIs = localStorage.getItem('selectedKBLIs');
-                if (savedKBLIs) {
-                    try {
-                        selectedKBLIs = JSON.parse(savedKBLIs);
-                        updateSelectedKBLIList();
-                        updateFinancialSummary();
-                    } catch (e) {
-                        console.error('Error parsing saved KBLIs:', e);
-                        localStorage.removeItem('selectedKBLIs'); // Clear corrupted data
-                    }
-                }
-
-                // Setup initial form elements
-                initializePersonForms();
-                initializeLocationDropdowns();
-                initializePaymentProofUpload();
-
-                // PERUBAHAN: JavaScript - Panggil fungsi untuk menyesuaikan lebar sticky bar
-                updateStickyBarWidth();
-
-                // Inisialisasi state awal
-                let currentStep = 1;
-                showStep(currentStep);
-                updateProgressIndicator(currentStep);
-                updateNavigationButtons(currentStep);
-
-                // Load initial KBLI data - ubah default ke 25 item
-                loadAllKBLIs(1, parseInt($('#kbli-per-page').val()));
+            .form-container {
+                padding: 1rem;
             }
 
-            // --- LOKASI DEPENDENT DROPDOWN ---
-            function initializeLocationDropdowns() {
-                const provinceSelect = $('#province');
-                const citySelect = $('#city');
-                const districtSelect = $('#district');
-                const villageSelect = $('#village');
+            .form-header h2 {
+                font-size: 1.25rem;
+            }
 
-                // Fungsi untuk mengisi dropdown
-                const populateDropdown = (dropdown, data) => {
-                    dropdown.empty().append('<option value="">-- Pilih --</option>');
-                    if (data) {
-                        $.each(data, function(key, value) {
-                            dropdown.append('<option value="' + key + '">' + value + '</option>');
-                        });
+            .form-header p {
+                font-size: 0.9rem;
+            }
+
+            .form-body .grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .form-input {
+                width: 100%;
+            }
+
+            .progress-sticky-bar {
+                left: 0;
+                transform: none;
+                border-radius: 0;
+                max-width: none;
+                padding: 0.75rem 1rem;
+            }
+
+            .progress-step-sticky-label {
+                display: none;
+            }
+
+            .kbli-table th,
+            .kbli-table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .kbli-table .col-kode {
+                width: 10%;
+            }
+
+            .kbli-table .col-judul {
+                width: 18%;
+            }
+
+            .kbli-table .col-uraian {
+                width: 62%;
+            }
+
+            .kbli-table .col-aksi {
+                width: 10%;
+            }
+
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .bank-option {
+                padding: 1rem;
+            }
+
+            .bank-option .bank-logo {
+                height: 2.5rem;
+            }
+
+            #bank-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    </head>
+
+    <body>
+
+        <!-- Container utama diubah untuk full width dan diberi wrapper -->
+        <div class="main-content-wrapper">
+            <div class="form-container">
+                <!-- Header -->
+                <div class="form-header">
+                    <h2>Form Pendirian pt</h2>
+                    <p>Lengkapi formulir berikut untuk mengajukan pendirian pt</p>
+                </div>
+
+                <!-- Body -->
+                <div class="form-body">
+                    @if(session('success'))
+                        <div class="success-box">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <span class="block sm:inline">{{ session('success') }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Progress Indicator Lama ( disembunyikan via CSS ) -->
+                    <div class="progress-indicator mb-8">
+                        <div class="progress-step active" data-step="1">
+                            <div class="progress-step-circle">1</div>
+                            <div class="progress-step-label">Informasi</div>
+                        </div>
+                        <div class="progress-step" data-step="2">
+                            <div class="progress-step-circle">2</div>
+                            <div class="progress-step-label">Direktur</div>
+                        </div>
+                        <div class="progress-step" data-step="3">
+                            <div class="progress-step-circle">3</div>
+                            <div class="progress-step-label">Komisaris</div>
+                        </div>
+                        <div class="progress-step" data-step="4">
+                            <div class="progress-step-circle">4</div>
+                            <div class="progress-step-label">KBLI & Bank</div>
+                        </div>
+                        <div class="progress-step" data-step="5">
+                            <div class="progress-step-circle">5</div>
+                            <div class="progress-step-label">Pembayaran</div>
+                        </div>
+                    </div>
+
+                    <form action="{{ route('pendirian.pt.store') }}" method="POST" enctype="multipart/form-data"
+                        id="pendirian-pt-form">
+                        @csrf
+                        <!-- Step 1: Informasi Dasar -->
+                        <div class="form-section" data-step="1">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-building"></i>
+                                Informasi Dasar Perusahaan
+                            </h3>
+
+                            <div class="form-group">
+                                <label for="nama_perusahaan" class="form-label required">Nama Perusahaan</label>
+                                <input type="text" class="form-input" id="nama_perusahaan" name="nama_perusahaan" required>
+                                <p class="form-help">Minimal 2 suku kata.</p>
+                                <div class="error-message" id="nama_perusahaan-error"></div>
+                            </div>
+
+                            <!-- Lokasi Section -->
+                            <div class="border-t pt-4 mt-4">
+                                <h4 class="text-md font-medium text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i>
+                                    Alamat Lengkap Perusahaan
+                                </h4>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label for="province" class="form-label required">Provinsi</label>
+                                        <select class="form-input" id="province" name="province" required>
+                                            <option value="">-- Pilih Provinsi --</option>
+                                        </select>
+                                        <div class="error-message" id="province-error"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="city" class="form-label required">Kota/Kabupaten</label>
+                                        <select class="form-input" id="city" name="city" required disabled>
+                                            <option value="">-- Pilih Kota --</option>
+                                        </select>
+                                        <div class="error-message" id="city-error"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="district" class="form-label required">Kecamatan</label>
+                                        <select class="form-input" id="district" name="district" required disabled>
+                                            <option value="">-- Pilih Kecamatan --</option>
+                                        </select>
+                                        <div class="error-message" id="district-error"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="village" class="form-label required">Desa/Kelurahan</label>
+                                        <select class="form-input" id="village" name="village" required disabled>
+                                            <option value="">-- Pilih Desa --</option>
+                                        </select>
+                                        <div class="error-message" id="village-error"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-4">
+                                    <label for="alamat_lengkap" class="form-label required">Alamat Lengkap</label>
+                                    <textarea class="form-input" id="alamat_lengkap" name="alamat_lengkap" rows="3" required
+                                        placeholder="Jalan, nomor rumah, RT/RW, dll."></textarea>
+                                    <div class="error-message" id="alamat_lengkap-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="kode_pos" class="form-label required">Kode Pos</label>
+                                    <input type="text" class="form-input" id="kode_pos" name="kode_pos" required
+                                        placeholder="Contoh: 12345">
+                                    <div class="error-message" id="kode_pos-error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Direktur -->
+                        <div class="form-section hidden" data-step="2">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-user-tie"></i>
+                                Informasi Direktur
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">Tambahkan informasi lengkap untuk setiap direktur
+                                perusahaan.</p>
+
+                            <div id="direktur-container" class="space-y-4">
+                                <!-- Direktur awal akan dirender oleh JS -->
+                            </div>
+
+                            <button type="button" class="btn btn-secondary btn-sm mt-4" id="add-direktur">
+                                <i class="fas fa-plus mr-2"></i>
+                                Tambah Direktur
+                            </button>
+                        </div>
+
+                        <!-- Step 3: Komisaris -->
+                        <div class="form-section hidden" data-step="3">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-users"></i>
+                                Informasi Komisaris
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">Tambahkan informasi lengkap untuk setiap komisaris
+                                perusahaan.</p>
+
+                            <div id="komisaris-container" class="space-y-4">
+                                <!-- Komisaris awal akan dirender oleh JS -->
+                            </div>
+
+                            <button type="button" class="btn btn-secondary btn-sm mt-4" id="add-komisaris">
+                                <i class="fas fa-plus mr-2"></i>
+                                Tambah Komisaris
+                            </button>
+                        </div>
+
+                        <!-- Step 4: KBLI & Rekanan Bank -->
+                        <div class="form-section hidden" data-step="4">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-list-alt"></i>
+                                KBLI (Klasifikasi Baku Lapangan Usaha Indonesia)
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">Pilih KBLI yang sesuai dengan bidang usaha Anda.</p>
+
+                            <div>
+                                <div class="mb-4">
+                                    <label for="kbli-search-input" class="form-label">Cari KBLI</label>
+                                    <div class="search-container">
+                                        <input type="text" id="kbli-search-input" class="form-input pl-10"
+                                            placeholder="Cari berdasarkan kode, judul, atau uraian (min. 3 karakter)...">
+                                        <i
+                                            class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <div class="search-suggestions" id="kbli-search-suggestions"></div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
+                                    <div class="flex items-center space-x-2">
+                                        <label for="kbli-per-page" class="text-sm text-gray-700">Tampilkan</label>
+                                        <select id="kbli-per-page" class="form-input w-auto">
+                                            <option value="10">10</option>
+                                            <option value="25" selected>25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <span class="text-sm text-gray-700">hasil</span>
+                                    </div>
+                                    <div id="kbli-search-summary" class="text-sm text-gray-600">Menampilkan 0 hingga 0 dari
+                                        0 hasil</div>
+                                </div>
+
+                                <div class="overflow-x-auto mb-4">
+                                    <table class="kbli-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-kode cursor-pointer hover:bg-gray-100" id="sort-kode">
+                                                    <div class="flex items-center space-x-1">
+                                                        <span>KODE</span>
+                                                        <span class="text-xs">↑↓</span>
+                                                    </div>
+                                                </th>
+                                                <th class="col-judul cursor-pointer hover:bg-gray-100 kbli-detail-trigger"
+                                                    id="sort-judul">
+                                                    <div class="flex items-center space-x-1">
+                                                        <span>JUDUL</span>
+                                                        <span class="text-xs">↑↓</span>
+                                                    </div>
+                                                </th>
+                                                <th class="col-uraian">URAIAN</th>
+                                                <th class="col-aksi">AKSI</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="kbli-results" class="bg-white divide-y divide-gray-200">
+                                            <tr>
+                                                <td colspan="4" class="py-4 text-center text-gray-500" id="kbli-no-data">
+                                                    Memuat data KBLI...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div id="kbli-pagination" class="flex justify-center mt-4"></div>
+                            </div>
+
+                            <div class="mt-6">
+                                <h4 class="text-md font-medium text-gray-900 mb-2 flex items-center">
+                                    <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                                    KBLI yang Dipilih (<span id="selected-kbli-count">0</span>)
+                                </h4>
+                                <div class="overflow-x-auto">
+                                    <table class="kbli-table">
+                                        <thead class="bg-blue-50">
+                                            <tr>
+                                                <th class="col-kode">NO</th>
+                                                <th class="col-kode">KODE</th>
+                                                <th class="col-judul">JUDUL</th>
+                                                <th class="col-uraian">URAIAN</th>
+                                                <th class="col-aksi">HAPUS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="selected-kbli-body" class="bg-white divide-y divide-gray-200">
+                                            <tr>
+                                                <td colspan="5" class="py-4 text-center text-gray-500">Belum ada KBLI yang
+                                                    dipilih.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <h3 class="text-lg font-bold mb-2">Informasi Biaya Tambahan KBLI</h3>
+                                    <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span></p>
+
+                                    <p class="text-sm">Untuk hingga 5 KBLI, <strong>Akta Notaris</strong> (Rp15.000)
+                                        <strong>dan</strong> <strong>NIB</strong> (Rp100.000) <em>wajib</em>.</p>
+
+                                    <div id="kbli-doc-options" class="mt-2 hidden">
+                                        <p class="text-sm font-semibold mb-1">Pilihan untuk Kelebihan KBLI (&gt;5):</p>
+                                        <label class="inline-flex items-center mr-4"><input type="radio"
+                                                name="kbli_doc_option_radio" value="akta"> <span class="ml-2">Akta saja
+                                                (Rp15.000)</span></label>
+                                        <label class="inline-flex items-center"><input type="radio"
+                                                name="kbli_doc_option_radio" value="both" checked> <span class="ml-2">Akta +
+                                                NIB (Rp15.000 + Rp100.000)</span></label>
+                                        <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="">
+                                        <input type="hidden" id="include_akta" name="include_akta" value="0">
+                                        <input type="hidden" id="include_nib" name="include_nib" value="0">
+                                    </div>
+
+                                    <p class="text-sm mt-2">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0
+                                            Kode</span></p>
+                                    <p class="text-sm">Rincian: <span id="kbli-cost-breakdown"
+                                            class="font-semibold">-</span></p>
+                                    <p class="text-xl font-extrabold mt-2">Total Biaya Tambahan: <span
+                                            id="total-kbli-charge">Rp0</span></p>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
+
+                            <!-- Rekanan Bank Section -->
+                            <div class="mt-8 border-t pt-6">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-university"></i>
+                                    Pilih Rekanan Bank
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-4">Pilih salah satu rekanan bank kami untuk proses
+                                    pembayaran.</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bank-options">
+                                    <!-- Bank options will be populated by JavaScript based on location -->
+                                </div>
+
+                                <input type="hidden" name="selected_bank" id="selected_bank" value="">
+                                <div class="error-message" id="selected_bank-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Selesai & Upload Bukti Bayar -->
+                        <div class="form-section hidden" data-step="5">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                Upload Bukti Pembayaran
+                            </h3>
+
+                            <div class="payment-proof-container" id="payment-proof-container">
+                                <div class="mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">Klik untuk upload atau seret file ke sini</p>
+                                <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 5MB)</p>
+                                <input type="file" id="payment_proof" name="payment_proof" class="hidden"
+                                    accept="image/*,.pdf">
+                                <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn">Pilih
+                                    File</button>
+                            </div>
+
+                            <div id="payment-proof-preview" class="mt-4 hidden">
+                                <div
+                                    class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
+                                        <div>
+                                            <p class="font-medium text-gray-900" id="payment-proof-name">File berhasil
+                                                diupload</p>
+                                            <p class="text-sm text-gray-500" id="payment-proof-size">0 KB</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="text-red-500 hover:text-red-700" id="remove-payment-proof">
+                                        <i class="fas fa-times-circle text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="error-message" id="payment_proof-error"></div>
+
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <h4 class="text-md font-medium mb-2">Ringkasan Pengajuan</h4>
+                                    <div id="submission-summary" class="text-sm">
+                                        <!-- Ringkasan akan diisi oleh JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-sticky-bar">
+            <div class="progress-sticky-content">
+                <button type="button" id="prev-step-btn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Kembali
+                </button>
+
+                <div class="progress-indicator-sticky-container">
+                    <div class="progress-indicator-sticky">
+                        <div class="progress-step-sticky active" data-step="1">
+                            <div class="progress-step-sticky-circle">1</div>
+                            <div class="progress-step-sticky-label">Informasi</div>
+                        </div>
+                        <div class="progress-step-sticky" data-step="2">
+                            <div class="progress-step-sticky-circle">2</div>
+                            <div class="progress-step-sticky-label">Direktur</div>
+                        </div>
+                        <div class="progress-step-sticky" data-step="3">
+                            <div class="progress-step-sticky-circle">3</div>
+                            <div class="progress-step-sticky-label">Komisaris</div>
+                        </div>
+                        <div class="progress-step-sticky" data-step="4">
+                            <div class="progress-step-sticky-circle">4</div>
+                            <div class="progress-step-sticky-label">KBLI & Bank</div>
+                        </div>
+                        <div class="progress-step-sticky" data-step="5">
+                            <div class="progress-step-sticky-circle">5</div>
+                            <div class="progress-step-sticky-label">Pembayaran</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="next-step-btn" class="btn btn-primary">
+                    Lanjutkan
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <!-- Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                // --- GLOBAL VARIABLES & CONFIGURATION ---
+                const MAX_KBLI_FREE = 5;
+                // Per-excess KBLI charge removed as per business rule
+                const COST_PER_EXCESS = 0;
+                // New: document fees and selection option for KBLI > 5
+                const AKTA_FEE = 15000;
+                const NIB_FEE = 100000;
+                let kbliDocOption = 'both'; // 'akta' or 'both'
+                let selectedKBLIs = [];
+                let kbliDetailsCache = {};
+                let currentKBLIPage = 1;
+                let lastKBLISearchQuery = '';
+                let selectedBank = '';
+                let searchSuggestions = [];
+                let activeSuggestionIndex = -1;
+
+                // --- INITIALIZATION ---
+                function initializeApp() {
+                    // Load saved KBLI from localStorage
+                    const savedKBLIs = localStorage.getItem('selectedKBLIs');
+                    if (savedKBLIs) {
+                        try {
+                            selectedKBLIs = JSON.parse(savedKBLIs);
+                            updateSelectedKBLIList();
+                            updateFinancialSummary();
+                        } catch (e) {
+                            console.error('Error parsing saved KBLIs:', e);
+                            localStorage.removeItem('selectedKBLIs'); // Clear corrupted data
+                        }
                     }
-                };
 
-                // Fungsi untuk melakukan fetch data
-                const fetchData = (url, id, targetDropdown, siblingDropdowns) => {
-                    if (!id) {
-                        targetDropdown.prop('disabled', true);
-                        populateDropdown(targetDropdown, null);
-                        siblingDropdowns.forEach(sibling => {
-                            sibling.prop('disabled', true);
-                            populateDropdown(sibling, null);
+                    // Setup initial form elements
+                    initializePersonForms();
+                    initializeLocationDropdowns();
+                    initializePaymentProofUpload();
+
+                    // PERUBAHAN: JavaScript - Panggil fungsi untuk menyesuaikan lebar sticky bar
+                    updateStickyBarWidth();
+
+                    // Inisialisasi state awal
+                    let currentStep = 1;
+                    showStep(currentStep);
+                    updateProgressIndicator(currentStep);
+                    updateNavigationButtons(currentStep);
+
+                    // Load initial KBLI data - ubah default ke 25 item
+                    loadAllKBLIs(1, parseInt($('#kbli-per-page').val()));
+                }
+
+                // --- LOKASI DEPENDENT DROPDOWN ---
+                function initializeLocationDropdowns() {
+                    const provinceSelect = $('#province');
+                    const citySelect = $('#city');
+                    const districtSelect = $('#district');
+                    const villageSelect = $('#village');
+
+                    // Fungsi untuk mengisi dropdown
+                    const populateDropdown = (dropdown, data) => {
+                        dropdown.empty().append('<option value="">-- Pilih --</option>');
+                        if (data) {
+                            $.each(data, function (key, value) {
+                                dropdown.append('<option value="' + key + '">' + value + '</option>');
+                            });
+                        }
+                    };
+
+                    // Fungsi untuk melakukan fetch data
+                    const fetchData = (url, id, targetDropdown, siblingDropdowns) => {
+                        if (!id) {
+                            targetDropdown.prop('disabled', true);
+                            populateDropdown(targetDropdown, null);
+                            siblingDropdowns.forEach(sibling => {
+                                sibling.prop('disabled', true);
+                                populateDropdown(sibling, null);
+                            });
+                            return;
+                        }
+
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            data: {
+                                id: id
+                            },
+                            success: function (data) {
+                                populateDropdown(targetDropdown, data);
+                                targetDropdown.prop('disabled', false);
+                            },
+                            error: function (xhr) {
+                                console.error('Error fetching location data:', xhr);
+                                showToast('Gagal memuat data lokasi. Silakan coba lagi.', 'error');
+                            }
                         });
+                    };
+
+                    // Load data Provinsi saat halaman dimuat
+                    $.ajax({
+                        url: '{{ route("provinces") }}',
+                        type: 'GET',
+                        success: function (data) {
+                            populateDropdown(provinceSelect, data);
+                        },
+                        error: function (xhr) {
+                            console.error('Error loading provinces:', xhr);
+                            showToast('Gagal memuat data provinsi. Silakan refresh halaman.', 'error');
+                        }
+                    });
+
+                    // Event Listener untuk Provinsi
+                    provinceSelect.on('change', function () {
+                        const provinceId = $(this).val();
+                        fetchData('{{ route("cities") }}', provinceId, citySelect, [districtSelect,
+                            villageSelect
+                        ]);
+                        // Update bank options when province changes
+                        updateBankOptions();
+                    });
+
+                    // Event Listener untuk Kota
+                    citySelect.on('change', function () {
+                        const cityId = $(this).val();
+                        fetchData('{{ route("districts") }}', cityId, districtSelect, [villageSelect]);
+                        // Update bank options when city changes
+                        updateBankOptions();
+                    });
+
+                    // PERBAIKAN: Event Listener untuk Kecamatan - ini yang diperbaiki
+                    districtSelect.on('change', function () {
+                        const districtId = $(this).val();
+                        console.log('District changed:', districtId); // Debug log
+                        fetchData('{{ route("villages") }}', districtId, villageSelect, []);
+                    });
+                }
+
+                // --- PAYMENT PROOF UPLOAD ---
+                function initializePaymentProofUpload() {
+                    const container = $('#payment-proof-container');
+                    const input = $('#payment_proof');
+                    const btn = $('#upload-payment-proof-btn');
+                    const preview = $('#payment-proof-preview');
+                    const removeBtn = $('#remove-payment-proof');
+                    const nameEl = $('#payment-proof-name');
+                    const sizeEl = $('#payment-proof-size');
+
+                    // PERBAIKAN: Event listener untuk tombol "Pilih File"
+                    btn.on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Upload button clicked'); // Debug log
+                        input.click();
+                    });
+
+                    // Click on container to trigger file input
+                    container.on('click', function (e) {
+                        // Jangan trigger jika yang diklik adalah tombol
+                        if (!$(e.target).is('#upload-payment-proof-btn')) {
+                            input.click();
+                        }
+                    });
+
+                    // Handle file selection
+                    input.on('change', function () {
+                        const file = this.files[0];
+                        if (file) {
+                            // Validate file size (5MB max)
+                            if (file.size > 5 * 1024 * 1024) {
+                                $('#payment_proof-error').text('Ukuran file terlalu besar. Maksimal 5MB.')
+                                    .show();
+                                input.val('');
+                                return;
+                            }
+
+                            // Validate file type
+                            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                            if (!allowedTypes.includes(file.type)) {
+                                $('#payment_proof-error').text(
+                                    'Format file tidak didukung. Gunakan JPG, PNG, atau PDF.').show();
+                                input.val('');
+                                return;
+                            }
+
+                            // Display file info
+                            nameEl.text(file.name);
+                            sizeEl.text(formatFileSize(file.size));
+                            preview.removeClass('hidden');
+                            container.addClass('has-file');
+                            $('#payment_proof-error').hide();
+                        }
+                    });
+
+                    // Handle file removal
+                    removeBtn.on('click', function () {
+                        input.val('');
+                        preview.addClass('hidden');
+                        container.removeClass('has-file');
+                    });
+
+                    // Drag and drop functionality
+                    container.on('dragover', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $(this).addClass('border-blue-500 bg-blue-50');
+                    });
+
+                    container.on('dragleave', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $(this).removeClass('border-blue-500 bg-blue-50');
+                    });
+
+                    container.on('drop', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $(this).removeClass('border-blue-500 bg-blue-50');
+
+                        const files = e.originalEvent.dataTransfer.files;
+                        if (files.length > 0) {
+                            input[0].files = files;
+                            input.trigger('change');
+                        }
+                    });
+                }
+
+                function formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+
+                // --- BANK PARTNER SELECTION ---
+                function updateBankOptions() {
+                    const provinceTextRaw = $('#province option:selected').text();
+                    const cityTextRaw = $('#city option:selected').text();
+                    const provinceText = (provinceTextRaw || '').toLowerCase().trim();
+                    const cityText = (cityTextRaw || '').toLowerCase().trim();
+                    const locationText = cityText || provinceText;
+                    const bankOptionsContainer = $('#bank-options');
+
+                    const bankLogosMap = {
+                        'Mandiri': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Bank_Mandiri_logo.svg/222px-Bank_Mandiri_logo.svg.png?20161029145158',
+                        'BNI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Wondr_by_BNI.svg/250px-Logo_Wondr_by_BNI.svg.png',
+                        'BRI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png',
+                        'BSI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png',
+                        'OCBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Logo-ocbc.svg/512px-Logo-ocbc.svg.png'
+                    };
+
+                    let availableBanks = [];
+
+                    if (!locationText || locationText.startsWith('-- pilih')) {
+                        bankOptionsContainer.html(
+                            '<p class="text-sm text-gray-500 col-span-full">Silakan pilih lokasi terlebih dahulu.</p>'
+                        );
                         return;
                     }
 
-                    $.ajax({
-                        url: url,
-                        type: 'GET',
-                        data: {
-                            id: id
-                        },
-                        success: function(data) {
-                            populateDropdown(targetDropdown, data);
-                            targetDropdown.prop('disabled', false);
-                        },
-                        error: function(xhr) {
-                            console.error('Error fetching location data:', xhr);
-                            showToast('Gagal memuat data lokasi. Silakan coba lagi.', 'error');
-                        }
+                    if (locationText.includes('makassar') || locationText.includes('gowa') || locationText.includes('maros')) {
+                        availableBanks = ['Mandiri', 'BNI', 'BRI', 'BSI'];
+                    } else if (locationText.includes('jakarta') || locationText.includes('bogor') ||
+                        locationText.includes('depok') || locationText.includes('tangerang') || locationText.includes(
+                            'tangerang selatan')) {
+                        availableBanks = ['Mandiri'];
+                    } else if (locationText.includes('bekasi') || provinceText.includes('jawa barat')) {
+                        availableBanks = ['BNI'];
+                    } else if (locationText) {
+                        availableBanks = ['OCBC'];
+                    }
+
+                    bankOptionsContainer.empty();
+                    availableBanks.forEach(bank => {
+                        const bankOption = $(`
+                            <div class="bank-option" data-bank="${bank}">
+                                <div class="flex items-center justify-center p-4">
+                                    <img src="${bankLogosMap[bank]}" alt="${bank}" class="bank-logo">
+                                </div>
+                                <div class="text-center mt-2">
+                                    <p class="font-medium text-gray-900">${bank}</p>
+                                </div>
+                            </div>
+                        `);
+                        bankOptionsContainer.append(bankOption);
                     });
-                };
 
-                // Load data Provinsi saat halaman dimuat
-                $.ajax({
-                    url: '{{ route("provinces") }}',
-                    type: 'GET',
-                    success: function(data) {
-                        populateDropdown(provinceSelect, data);
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading provinces:', xhr);
-                        showToast('Gagal memuat data provinsi. Silakan refresh halaman.', 'error');
+                    // Add click event to bank options
+                    $('.bank-option').on('click', function () {
+                        $('.bank-option').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedBank = $(this).data('bank');
+                        $('#selected_bank').val(selectedBank);
+                        $('#selected_bank-error').hide();
+                    });
+                }
+
+                // --- HELPER FUNCTIONS ---
+                function showToast(message, type = 'info') {
+                    $('.toast').remove();
+                    let icon = '';
+
+                    if (type === 'success') {
+                        icon = '<i class="fas fa-check-circle"></i>';
+                    } else if (type === 'error') {
+                        icon = '<i class="fas fa-exclamation-circle"></i>';
+                    } else {
+                        icon = '<i class="fas fa-info-circle"></i>';
                     }
-                });
 
-                // Event Listener untuk Provinsi
-                provinceSelect.on('change', function() {
-                    const provinceId = $(this).val();
-                    fetchData('{{ route("cities") }}', provinceId, citySelect, [districtSelect,
-                        villageSelect
-                    ]);
-                    // Update bank options when province changes
-                    updateBankOptions();
-                });
+                    const toast = $(`<div class="toast toast-${type}">${icon}<span>${message}</span></div>`);
+                    $('body').append(toast);
+                    setTimeout(() => toast.addClass('show'), 10);
+                    setTimeout(() => {
+                        toast.removeClass('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
 
-                // Event Listener untuk Kota
-                citySelect.on('change', function() {
-                    const cityId = $(this).val();
-                    fetchData('{{ route("districts") }}', cityId, districtSelect, [villageSelect]);
-                    // Update bank options when city changes
-                    updateBankOptions();
-                });
+                function escapeRegExp(string) {
+                    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                }
 
-                // PERBAIKAN: Event Listener untuk Kecamatan - ini yang diperbaiki
-                districtSelect.on('change', function() {
-                    const districtId = $(this).val();
-                    console.log('District changed:', districtId); // Debug log
-                    fetchData('{{ route("villages") }}', districtId, villageSelect, []);
-                });
-            }
+                function highlightText(text, query) {
+                    if (!query || query.length < 3) return text;
+                    const escaped = escapeRegExp(query);
+                    const regex = new RegExp('(' + escaped + ')', 'gi');
+                    return text.replace(regex, '<span class="highlight">$1</span>');
+                }
 
-            // --- PAYMENT PROOF UPLOAD ---
-            function initializePaymentProofUpload() {
-                const container = $('#payment-proof-container');
-                const input = $('#payment_proof');
-                const btn = $('#upload-payment-proof-btn');
-                const preview = $('#payment-proof-preview');
-                const removeBtn = $('#remove-payment-proof');
-                const nameEl = $('#payment-proof-name');
-                const sizeEl = $('#payment-proof-size');
+                // --- MULTI-STEP FORM LOGIC ---
+                function showStep(step) {
+                    $('.form-section').addClass('hidden');
+                    $(`.form-section[data-step="${step}"]`).removeClass('hidden');
+                    if (step === 5) updateSubmissionSummary();
+                    if (step === 4) updateBankOptions();
+                }
 
-                // PERBAIKAN: Event listener untuk tombol "Pilih File"
-                btn.on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Upload button clicked'); // Debug log
-                    input.click();
-                });
-
-                // Click on container to trigger file input
-                container.on('click', function(e) {
-                    // Jangan trigger jika yang diklik adalah tombol
-                    if (!$(e.target).is('#upload-payment-proof-btn')) {
-                        input.click();
+                function updateProgressIndicator(step) {
+                    // Update progress bar di sticky
+                    $('.progress-step-sticky').removeClass('active completed');
+                    for (let i = 1; i < step; i++) {
+                        $(`.progress-step-sticky[data-step="${i}"]`).addClass('completed');
                     }
-                });
+                    $(`.progress-step-sticky[data-step="${step}"]`).addClass('active');
+                }
 
-                // Handle file selection
-                input.on('change', function() {
-                    const file = this.files[0];
-                    if (file) {
-                        // Validate file size (5MB max)
-                        if (file.size > 5 * 1024 * 1024) {
-                            $('#payment_proof-error').text('Ukuran file terlalu besar. Maksimal 5MB.')
+                // --- GANTI FUNGSI INI ---
+                function updateNavigationButtons(step) {
+                    const prevBtn = $('#prev-step-btn');
+                    const nextBtn = $('#next-step-btn');
+
+                    prevBtn.prop('disabled', step === 1);
+
+                    // PERUBAHAN UTAMA: Langkah 4 sekarang adalah titik submit
+                    if (step === 4) {
+                        // Ubah tombol menjadi tombol submit
+                        nextBtn.html('Ajukan Pendirian<i class="fas fa-check ml-2"></i>').attr('type', 'submit').off(
+                            'click');
+                    } else {
+                        // Logika normal untuk step 1, 2, 3
+                        nextBtn.html('Lanjutkan<i class="fas fa-arrow-right ml-2"></i>').attr('type', 'button').off(
+                            'click').on('click', handleNext);
+                    }
+                }
+
+
+
+                function handleNext() {
+                    const currentStep = $('.progress-step-sticky.active').data('step');
+                    if (validateStep(currentStep)) {
+                        const nextStep = currentStep + 1;
+                        showStep(nextStep);
+                        updateProgressIndicator(nextStep);
+                        updateNavigationButtons(nextStep);
+                    }
+                }
+
+                function handlePrev() {
+                    const currentStep = $('.progress-step-sticky.active').data('step');
+                    const prevStep = currentStep - 1;
+                    showStep(prevStep);
+                    updateProgressIndicator(prevStep);
+                    updateNavigationButtons(prevStep);
+                }
+
+                // Event Listener untuk tombol di sticky bar
+                $('#next-step-btn').on('click', handleNext);
+                $('#prev-step-btn').on('click', handlePrev);
+
+                function validateStep(step) {
+                    let isValid = true;
+                    $('.error-message').hide();
+                    $('.form-input').removeClass('error');
+
+                    if (step === 1) {
+                        const namaPerusahaan = $('#nama_perusahaan').val().trim();
+                        const province = $('#province').val();
+                        const city = $('#city').val();
+                        const district = $('#district').val();
+                        const village = $('#village').val();
+                        const alamatLengkap = $('#alamat_lengkap').val().trim();
+                        const kodePos = $('#kode_pos').val().trim();
+
+                        if (!namaPerusahaan || namaPerusahaan.split(/\s+/).length < 2) {
+                            $('#nama_perusahaan-error').text('Nama perusahaan harus memiliki minimal 2 suku kata.')
                                 .show();
-                            input.val('');
-                            return;
+                            $('#nama_perusahaan').addClass('error');
+                            isValid = false;
+                        } else if (!province) {
+                            $('#province-error').text('Silakan pilih provinsi.').show();
+                            $('#province').addClass('error');
+                            isValid = false;
+                        } else if (!city) {
+                            $('#city-error').text('Silakan pilih kota/kabupaten.').show();
+                            $('#city').addClass('error');
+                            isValid = false;
+                        } else if (!district) {
+                            $('#district-error').text('Silakan pilih kecamatan.').show();
+                            $('#district').addClass('error');
+                            isValid = false;
+                        } else if (!village) {
+                            $('#village-error').text('Silakan pilih desa/kelurahan.').show();
+                            $('#village').addClass('error');
+                            isValid = false;
+                        } else if (!alamatLengkap) {
+                            $('#alamat_lengkap-error').text('Silakan isi alamat lengkap perusahaan.').show();
+                            $('#alamat_lengkap').addClass('error');
+                            isValid = false;
+                        } else if (!kodePos) {
+                            $('#kode_pos-error').text('Silakan isi kode pos.').show();
+                            $('#kode_pos').addClass('error');
+                            isValid = false;
                         }
+                    } else if (step === 2) {
+                        // Validate director information
+                        let hasValidDirector = false;
+                        $('#direktur-container .person-entry').each(function () {
+                            const nama = $(this).find('input[name*="[nama]"]').val().trim();
+                            const ktp = $(this).find('input[name*="[ktp]"]').val();
 
-                        // Validate file type
-                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-                        if (!allowedTypes.includes(file.type)) {
-                            $('#payment_proof-error').text(
-                                'Format file tidak didukung. Gunakan JPG, PNG, atau PDF.').show();
-                            input.val('');
-                            return;
+                            if (!nama) {
+                                $(this).find('input[name*="[nama]"]').addClass('error');
+                                isValid = false;
+                            }
+
+                            if (!ktp) {
+                                $(this).find('input[name*="[ktp]"]').addClass('error');
+                                isValid = false;
+                            }
+
+                            if (nama && ktp) {
+                                hasValidDirector = true;
+                            }
+                        });
+
+                        if (!hasValidDirector) {
+                            showToast('Setidaknya satu direktur harus memiliki nama dan KTP yang valid.', 'error');
+                            isValid = false;
                         }
+                    } else if (step === 3) {
+                        // Validate commissioner information
+                        let hasValidCommissioner = false;
+                        $('#komisaris-container .person-entry').each(function () {
+                            const nama = $(this).find('input[name*="[nama]"]').val().trim();
+                            const ktp = $(this).find('input[name*="[ktp]"]').val();
 
-                        // Display file info
-                        nameEl.text(file.name);
-                        sizeEl.text(formatFileSize(file.size));
-                        preview.removeClass('hidden');
-                        container.addClass('has-file');
-                        $('#payment_proof-error').hide();
-                    }
-                });
+                            if (!nama) {
+                                $(this).find('input[name*="[nama]"]').addClass('error');
+                                isValid = false;
+                            }
 
-                // Handle file removal
-                removeBtn.on('click', function() {
-                    input.val('');
-                    preview.addClass('hidden');
-                    container.removeClass('has-file');
-                });
+                            if (!ktp) {
+                                $(this).find('input[name*="[ktp]"]').addClass('error');
+                                isValid = false;
+                            }
 
-                // Drag and drop functionality
-                container.on('dragover', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $(this).addClass('border-blue-500 bg-blue-50');
-                });
+                            if (nama && ktp) {
+                                hasValidCommissioner = true;
+                            }
+                        });
 
-                container.on('dragleave', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $(this).removeClass('border-blue-500 bg-blue-50');
-                });
-
-                container.on('drop', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $(this).removeClass('border-blue-500 bg-blue-50');
-
-                    const files = e.originalEvent.dataTransfer.files;
-                    if (files.length > 0) {
-                        input[0].files = files;
-                        input.trigger('change');
-                    }
-                });
-            }
-
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-
-            // --- BANK PARTNER SELECTION ---
-            function updateBankOptions() {
-                const provinceTextRaw = $('#province option:selected').text();
-                const cityTextRaw = $('#city option:selected').text();
-                const provinceText = (provinceTextRaw || '').toLowerCase().trim();
-                const cityText = (cityTextRaw || '').toLowerCase().trim();
-                const locationText = cityText || provinceText;
-                const bankOptionsContainer = $('#bank-options');
-
-                const bankLogosMap = {
-                    'Mandiri': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Bank_Mandiri_logo.svg/222px-Bank_Mandiri_logo.svg.png?20161029145158',
-                    'BNI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Wondr_by_BNI.svg/250px-Logo_Wondr_by_BNI.svg.png',
-                    'BRI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png',
-                    'BSI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png',
-                    'OCBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Logo-ocbc.svg/512px-Logo-ocbc.svg.png'
-                };
-
-                let availableBanks = [];
-
-                if (!locationText || locationText.startsWith('-- pilih')) {
-                    bankOptionsContainer.html(
-                        '<p class="text-sm text-gray-500 col-span-full">Silakan pilih lokasi terlebih dahulu.</p>'
-                    );
-                    return;
-                }
-
-                if (locationText.includes('makassar') || locationText.includes('gowa') || locationText.includes('maros')) {
-                    availableBanks = ['Mandiri', 'BNI', 'BRI', 'BSI'];
-                } else if (locationText.includes('jakarta') || locationText.includes('bogor') ||
-                    locationText.includes('depok') || locationText.includes('tangerang') || locationText.includes(
-                        'tangerang selatan')) {
-                    availableBanks = ['Mandiri'];
-                } else if (locationText.includes('bekasi') || provinceText.includes('jawa barat')) {
-                    availableBanks = ['BNI'];
-                } else if (locationText) {
-                    availableBanks = ['OCBC'];
-                }
-
-                bankOptionsContainer.empty();
-                availableBanks.forEach(bank => {
-                    const bankOption = $(`
-                        <div class="bank-option" data-bank="${bank}">
-                            <div class="flex items-center justify-center p-4">
-                                <img src="${bankLogosMap[bank]}" alt="${bank}" class="bank-logo">
-                            </div>
-                            <div class="text-center mt-2">
-                                <p class="font-medium text-gray-900">${bank}</p>
-                            </div>
-                        </div>
-                    `);
-                    bankOptionsContainer.append(bankOption);
-                });
-
-                // Add click event to bank options
-                $('.bank-option').on('click', function() {
-                    $('.bank-option').removeClass('selected');
-                    $(this).addClass('selected');
-                    selectedBank = $(this).data('bank');
-                    $('#selected_bank').val(selectedBank);
-                    $('#selected_bank-error').hide();
-                });
-            }
-
-            // --- HELPER FUNCTIONS ---
-            function showToast(message, type = 'info') {
-                $('.toast').remove();
-                let icon = '';
-
-                if (type === 'success') {
-                    icon = '<i class="fas fa-check-circle"></i>';
-                } else if (type === 'error') {
-                    icon = '<i class="fas fa-exclamation-circle"></i>';
-                } else {
-                    icon = '<i class="fas fa-info-circle"></i>';
-                }
-
-                const toast = $(`<div class="toast toast-${type}">${icon}<span>${message}</span></div>`);
-                $('body').append(toast);
-                setTimeout(() => toast.addClass('show'), 10);
-                setTimeout(() => {
-                    toast.removeClass('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-
-            function escapeRegExp(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }
-
-            function highlightText(text, query) {
-                if (!query || query.length < 3) return text;
-                const escaped = escapeRegExp(query);
-                const regex = new RegExp('(' + escaped + ')', 'gi');
-                return text.replace(regex, '<span class="highlight">$1</span>');
-            }
-
-            // --- MULTI-STEP FORM LOGIC ---
-            function showStep(step) {
-                $('.form-section').addClass('hidden');
-                $(`.form-section[data-step="${step}"]`).removeClass('hidden');
-                if (step === 5) updateSubmissionSummary();
-                if (step === 4) updateBankOptions();
-            }
-
-            function updateProgressIndicator(step) {
-                // Update progress bar di sticky
-                $('.progress-step-sticky').removeClass('active completed');
-                for (let i = 1; i < step; i++) {
-                    $(`.progress-step-sticky[data-step="${i}"]`).addClass('completed');
-                }
-                $(`.progress-step-sticky[data-step="${step}"]`).addClass('active');
-            }
-
-            // --- GANTI FUNGSI INI ---
-            function updateNavigationButtons(step) {
-                const prevBtn = $('#prev-step-btn');
-                const nextBtn = $('#next-step-btn');
-
-                prevBtn.prop('disabled', step === 1);
-
-                // PERUBAHAN UTAMA: Langkah 4 sekarang adalah titik submit
-                if (step === 4) {
-                    // Ubah tombol menjadi tombol submit
-                    nextBtn.html('Ajukan Pendirian<i class="fas fa-check ml-2"></i>').attr('type', 'submit').off(
-                        'click');
-                } else {
-                    // Logika normal untuk step 1, 2, 3
-                    nextBtn.html('Lanjutkan<i class="fas fa-arrow-right ml-2"></i>').attr('type', 'button').off(
-                        'click').on('click', handleNext);
-                }
-            }
-
-            // --- GANTI EVENT LISTENER INI ---
-            $('#pendirian-PT-form').on('submit', function(e) {
-                e.preventDefault();
-
-                // HANYA VALIDASI SAMPAI LANGKAH 4, karena data dikirim dari sana
-                let allValid = true;
-                for (let i = 1; i <= 4; i++) {
-                    if (!validateStep(i)) {
-                        allValid = false;
-                        showStep(i);
-                        updateProgressIndicator(i);
-                        updateNavigationButtons(i);
-                        break;
-                    }
-                }
-
-                if (!allValid) return;
-
-                const submitBtn = $('#next-step-btn');
-                const originalText = submitBtn.html();
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
-
-                const formData = new FormData(this);
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        showToast(
-                            'Pengajuan berhasil dibuat! Anda akan diarahkan ke halaman pembayaran.',
-                            'success');
-                        localStorage.removeItem('selectedKBLIs');
-                        // Arahkan ke halaman pembayaran yang baru
-                        setTimeout(() => {
-                            window.location.href = response.redirect_url;
-                        }, 2000);
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                '<br>');
+                        if (!hasValidCommissioner) {
+                            showToast('Setidaknya satu komisaris harus memiliki nama dan KTP yang valid.', 'error');
+                            isValid = false;
                         }
-                        showToast(errorMessage, 'error');
-                        submitBtn.prop('disabled', false).html(originalText);
-                    }
-                });
-            });
-
-            function handleNext() {
-                const currentStep = $('.progress-step-sticky.active').data('step');
-                if (validateStep(currentStep)) {
-                    const nextStep = currentStep + 1;
-                    showStep(nextStep);
-                    updateProgressIndicator(nextStep);
-                    updateNavigationButtons(nextStep);
-                }
-            }
-
-            function handlePrev() {
-                const currentStep = $('.progress-step-sticky.active').data('step');
-                const prevStep = currentStep - 1;
-                showStep(prevStep);
-                updateProgressIndicator(prevStep);
-                updateNavigationButtons(prevStep);
-            }
-
-            // Event Listener untuk tombol di sticky bar
-            $('#next-step-btn').on('click', handleNext);
-            $('#prev-step-btn').on('click', handlePrev);
-
-            function validateStep(step) {
-                let isValid = true;
-                $('.error-message').hide();
-                $('.form-input').removeClass('error');
-
-                if (step === 1) {
-                    const namaPerusahaan = $('#nama_perusahaan').val().trim();
-                    const province = $('#province').val();
-                    const city = $('#city').val();
-                    const district = $('#district').val();
-                    const village = $('#village').val();
-                    const alamatLengkap = $('#alamat_lengkap').val().trim();
-                    const kodePos = $('#kode_pos').val().trim();
-
-                    if (!namaPerusahaan || namaPerusahaan.split(/\s+/).length < 2) {
-                        $('#nama_perusahaan-error').text('Nama perusahaan harus memiliki minimal 2 suku kata.')
-                            .show();
-                        $('#nama_perusahaan').addClass('error');
-                        isValid = false;
-                    } else if (!province) {
-                        $('#province-error').text('Silakan pilih provinsi.').show();
-                        $('#province').addClass('error');
-                        isValid = false;
-                    } else if (!city) {
-                        $('#city-error').text('Silakan pilih kota/kabupaten.').show();
-                        $('#city').addClass('error');
-                        isValid = false;
-                    } else if (!district) {
-                        $('#district-error').text('Silakan pilih kecamatan.').show();
-                        $('#district').addClass('error');
-                        isValid = false;
-                    } else if (!village) {
-                        $('#village-error').text('Silakan pilih desa/kelurahan.').show();
-                        $('#village').addClass('error');
-                        isValid = false;
-                    } else if (!alamatLengkap) {
-                        $('#alamat_lengkap-error').text('Silakan isi alamat lengkap perusahaan.').show();
-                        $('#alamat_lengkap').addClass('error');
-                        isValid = false;
-                    } else if (!kodePos) {
-                        $('#kode_pos-error').text('Silakan isi kode pos.').show();
-                        $('#kode_pos').addClass('error');
-                        isValid = false;
-                    }
-                } else if (step === 2) {
-                    // Validate director information
-                    let hasValidDirector = false;
-                    $('#direktur-container .person-entry').each(function() {
-                        const nama = $(this).find('input[name*="[nama]"]').val().trim();
-                        const ktp = $(this).find('input[name*="[ktp]"]').val();
-
-                        if (!nama) {
-                            $(this).find('input[name*="[nama]"]').addClass('error');
+                    } else if (step === 4) {
+                        // Validate KBLI selection
+                        if (selectedKBLIs.length === 0) {
+                            showToast('Pilih setidaknya satu KBLI untuk melanjutkan.', 'error');
                             isValid = false;
                         }
 
-                        if (!ktp) {
-                            $(this).find('input[name*="[ktp]"]').addClass('error');
-                            isValid = false;
-                        }
-
-                        if (nama && ktp) {
-                            hasValidDirector = true;
-                        }
-                    });
-
-                    if (!hasValidDirector) {
-                        showToast('Setidaknya satu direktur harus memiliki nama dan KTP yang valid.', 'error');
-                        isValid = false;
-                    }
-                } else if (step === 3) {
-                    // Validate commissioner information
-                    let hasValidCommissioner = false;
-                    $('#komisaris-container .person-entry').each(function() {
-                        const nama = $(this).find('input[name*="[nama]"]').val().trim();
-                        const ktp = $(this).find('input[name*="[ktp]"]').val();
-
-                        if (!nama) {
-                            $(this).find('input[name*="[nama]"]').addClass('error');
-                            isValid = false;
-                        }
-
-                        if (!ktp) {
-                            $(this).find('input[name*="[ktp]"]').addClass('error');
-                            isValid = false;
-                        }
-
-                        if (nama && ktp) {
-                            hasValidCommissioner = true;
-                        }
-                    });
-
-                    if (!hasValidCommissioner) {
-                        showToast('Setidaknya satu komisaris harus memiliki nama dan KTP yang valid.', 'error');
-                        isValid = false;
-                    }
-                } else if (step === 4) {
-                    // Validate KBLI selection
-                    if (selectedKBLIs.length === 0) {
-                        showToast('Pilih setidaknya satu KBLI untuk melanjutkan.', 'error');
-                        isValid = false;
-                    }
-
-                    // Validate document choices based on count
-                    const kbliCount = selectedKBLIs.length;
-                    if (kbliCount > 0) {
-                        if (kbliCount <= MAX_KBLI_FREE) {
-                            // both required, values are set automatically in updateFinancialSummary
-                        } else {
+                        // Validate document choices based on count
+                        const kbliCount = selectedKBLIs.length;
+                        if (kbliCount > MAX_KBLI_FREE) {
                             const opt = $('#kbli_doc_option').val();
                             if (!opt || (opt !== 'akta' && opt !== 'both')) {
                                 showToast('Silakan pilih opsi dokumen untuk kelebihan KBLI (Akta atau Akta + NIB).', 'error');
                                 isValid = false;
                             }
                         }
+
+                        // Validate bank selection
+                        if (!selectedBank) {
+                            $('#selected_bank-error').text('Silakan pilih rekanan bank.').show();
+                            isValid = false;
+                        }
+                    } else if (step === 5) {
+                        // Validate payment proof
+                        const paymentProof = $('#payment_proof').val();
+                        if (!paymentProof) {
+                            $('#payment_proof-error').text('Silakan upload bukti pembayaran.').show();
+                            isValid = false;
+                        }
                     }
 
-                    // Validate bank selection
-                    if (!selectedBank) {
-                        $('#selected_bank-error').text('Silakan pilih rekanan bank.').show();
-                        isValid = false;
-                    }
-                } else if (step === 5) {
-                    // Validate payment proof
-                    const paymentProof = $('#payment_proof').val();
-                    if (!paymentProof) {
-                        $('#payment_proof-error').text('Silakan upload bukti pembayaran.').show();
-                        isValid = false;
-                    }
+                    return isValid;
                 }
 
-                return isValid;
-            }
 
-            function updateSubmissionSummary() {
-                const namaPerusahaan = $('#nama_perusahaan').val();
-                const provinceText = $('#province option:selected').text();
-                const cityText = $('#city option:selected').text();
-                const direkturCount = $('#direktur-container .person-entry').length;
-                const komisarisCount = $('#komisaris-container .person-entry').length;
-                const kbliCount = selectedKBLIs.length;
-                const bankName = selectedBank || 'Belum dipilih';
 
-                let summaryHTML = `
-                <p><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</p>
-                <p><strong>Lokasi:</strong> ${provinceText}, ${cityText}</p>
-                <p><strong>Jumlah Direktur:</strong> ${direkturCount}</p>
-                <p><strong>Jumlah Komisaris:</strong> ${komisarisCount}</p>
-                <p><strong>Jumlah KBLI:</strong> ${kbliCount}</p>
-                <p><strong>Rekanan Bank:</strong> ${bankName}</p>
-            `;
-
-                if (kbliCount > MAX_KBLI_FREE) {
-                    const excessCount = kbliCount - MAX_KBLI_FREE;
-                    const docOption = $('#kbli_doc_option').val() || 'both';
-                    const perUnit = (docOption === 'akta') ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
-                    const totalCharge = excessCount * perUnit;
-                    summaryHTML += `<p class="text-red-600 mt-2"><strong>Biaya Tambahan KBLI:</strong> ${excessCount} × Rp${perUnit.toLocaleString('id-ID')} = Rp${totalCharge.toLocaleString('id-ID')}</p>`;
-                }
-                $('#submission-summary').html(summaryHTML);
-            }
-
-            // --- PERSON FORM (DIREKTUR/KOMISARIS) LOGIC ---
-            function createPersonTemplate(type, index) {
-                const title = type.charAt(0).toUpperCase() + type.slice(1);
-                return `
-                <div class="person-entry" data-type="${type}" data-index="${index}">
-                    <div class="person-entry-header">
-                        <h4 class="person-entry-title">
-                            <i class="fas fa-user"></i>
-                            ${title} #${index + 1}
-                        </h4>
-                        ${index > 0 ? `<button type="button" class="remove-person text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>` : ''}
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="mb-4">
-                            <label for="${type}_${index}_nama" class="form-label required">Nama Lengkap</label>
-                            <input type="text" id="${type}_${index}_nama" name="${type}[${index}][nama]" class="form-input" required>
-                            <div class="error-message" id="${type}_${index}_nama-error"></div>
+                // --- PERSON FORM (DIREKTUR/KOMISARIS) LOGIC ---
+                function createPersonTemplate(type, index) {
+                    const title = type.charAt(0).toUpperCase() + type.slice(1);
+                    return `
+                    <div class="person-entry" data-type="${type}" data-index="${index}">
+                        <div class="person-entry-header">
+                            <h4 class="person-entry-title">
+                                <i class="fas fa-user"></i>
+                                ${title} #${index + 1}
+                            </h4>
+                            ${index > 0 ? `<button type="button" class="remove-person text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
                         </div>
-                        <div class="mb-4">
-                            <label for="${type}_${index}_ktp" class="form-label required">Upload KTP</label>
-                            <input type="file" id="${type}_${index}_ktp" name="${type}[${index}][ktp]" class="form-input" accept="image/*,.pdf" required>
-                            <div class="mt-1 preview-container">
-                                <img src="" alt="KTP Preview" class="preview-image hidden">
-                                <button type="button" class="preview-remove hidden"><i class="fas fa-times"></i></button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label for="${type}_${index}_nama" class="form-label required">Nama Lengkap</label>
+                                <input type="text" id="${type}_${index}_nama" name="${type}[${index}][nama]" class="form-input" required>
+                                <div class="error-message" id="${type}_${index}_nama-error"></div>
                             </div>
-                            <div class="error-message" id="${type}_${index}_ktp-error"></div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="${type}_${index}_npwp" class="form-label">Upload NPWP (Opsional)</label>
-                            <input type="file" id="${type}_${index}_npwp" name="${type}[${index}][npwp]" class="form-input" accept="image/*,.pdf">
-                            <div class="mt-1 preview-container">
-                                <img src="" alt="NPWP Preview" class="preview-image hidden">
-                                <button type="button" class="preview-remove hidden"><i class="fas fa-times"></i></button>
+                            <div class="mb-4">
+                                <label for="${type}_${index}_ktp" class="form-label required">Upload KTP</label>
+                                <input type="file" id="${type}_${index}_ktp" name="${type}[${index}][ktp]" class="form-input" accept="image/*,.pdf" required>
+                                <div class="mt-1 preview-container">
+                                    <img src="" alt="KTP Preview" class="preview-image hidden">
+                                    <button type="button" class="preview-remove hidden"><i class="fas fa-times"></i></button>
+                                </div>
+                                <div class="error-message" id="${type}_${index}_ktp-error"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="${type}_${index}_npwp" class="form-label">Upload NPWP (Opsional)</label>
+                                <input type="file" id="${type}_${index}_npwp" name="${type}[${index}][npwp]" class="form-input" accept="image/*,.pdf">
+                                <div class="mt-1 preview-container">
+                                    <img src="" alt="NPWP Preview" class="preview-image hidden">
+                                    <button type="button" class="preview-remove hidden"><i class="fas fa-times"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
-            }
+                `;
+                }
 
-            function initializePersonForms() {
-                $('#direktur-container').html(createPersonTemplate('direktur', 0));
-                $('#komisaris-container').html(createPersonTemplate('komisaris', 0));
-                setupPersonFormEvents();
-            }
+                function initializePersonForms() {
+                    $('#direktur-container').html(createPersonTemplate('direktur', 0));
+                    $('#komisaris-container').html(createPersonTemplate('komisaris', 0));
+                    setupPersonFormEvents();
+                }
 
-            function setupPersonFormEvents() {
-                $(document).on('click', '#add-direktur', function() {
-                    const count = $('#direktur-container .person-entry').length;
-                    $('#direktur-container').append(createPersonTemplate('direktur', count));
-                });
-
-                $(document).on('click', '#add-komisaris', function() {
-                    const count = $('#komisaris-container .person-entry').length;
-                    $('#komisaris-container').append(createPersonTemplate('komisaris', count));
-                });
-
-                $(document).on('click', '.remove-person', function() {
-                    $(this).closest('.person-entry').remove();
-                    updatePersonIndices('direktur');
-                    updatePersonIndices('komisaris');
-                });
-
-                $(document).on('change', 'input[type="file"]', function() {
-                    const file = this.files[0];
-                    const previewContainer = $(this).siblings('.preview-container');
-                    const previewImage = previewContainer.find('.preview-image');
-                    const removeBtn = previewContainer.find('.preview-remove');
-
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            previewImage.attr('src', e.target.result).removeClass('hidden');
-                            removeBtn.removeClass('hidden');
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        previewImage.addClass('hidden');
-                        removeBtn.addClass('hidden');
-                    }
-                });
-
-                $(document).on('click', '.preview-remove', function() {
-                    const container = $(this).closest('.preview-container');
-                    const input = container.siblings('input[type="file"]');
-                    input.val('');
-                    container.find('.preview-image, .preview-remove').addClass('hidden');
-                });
-            }
-
-            function updatePersonIndices(type) {
-                $(`#${type}-container .person-entry`).each(function(index) {
-                    const $entry = $(this);
-                    $entry.attr('data-index', index);
-                    $entry.find('h4').html(
-                        `<i class="fas fa-user"></i>${type.charAt(0).toUpperCase() + type.slice(1)} #${index + 1}`
-                    );
-                    $entry.find('input, label').each(function() {
-                        const $el = $(this);
-                        const name = $el.attr('name');
-                        const forAttr = $el.attr('for');
-                        if (name) $el.attr('name', name.replace(/\[\d+\]/, `[${index}]`));
-                        if (forAttr) $el.attr('for', forAttr.replace(/_\d+/, `_${index}`));
+                function setupPersonFormEvents() {
+                    $(document).on('click', '#add-direktur', function () {
+                        const count = $('#direktur-container .person-entry').length;
+                        $('#direktur-container').append(createPersonTemplate('direktur', count));
                     });
-                });
-            }
 
-            // --- KBLI FUNCTIONALITY ---
-            function renderKBLIResults(items, query) {
-                const tbody = $('#kbli-results');
-                tbody.empty();
-                if (!items || items.length === 0) {
-                    tbody.html(
-                        `<tr><td colspan="4" class="py-4 text-center text-gray-500">Tidak ada hasil untuk "${query || 'semua data'}"</td></tr>`
-                    );
-                    return;
+                    $(document).on('click', '#add-komisaris', function () {
+                        const count = $('#komisaris-container .person-entry').length;
+                        $('#komisaris-container').append(createPersonTemplate('komisaris', count));
+                    });
+
+                    $(document).on('click', '.remove-person', function () {
+                        $(this).closest('.person-entry').remove();
+                        updatePersonIndices('direktur');
+                        updatePersonIndices('komisaris');
+                    });
+
+                    $(document).on('change', 'input[type="file"]', function () {
+                        const file = this.files[0];
+                        const previewContainer = $(this).siblings('.preview-container');
+                        const previewImage = previewContainer.find('.preview-image');
+                        const removeBtn = previewContainer.find('.preview-remove');
+
+                        if (file && file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                previewImage.attr('src', e.target.result).removeClass('hidden');
+                                removeBtn.removeClass('hidden');
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            previewImage.addClass('hidden');
+                            removeBtn.addClass('hidden');
+                        }
+                    });
+
+                    $(document).on('click', '.preview-remove', function () {
+                        const container = $(this).closest('.preview-container');
+                        const input = container.siblings('input[type="file"]');
+                        input.val('');
+                        container.find('.preview-image, .preview-remove').addClass('hidden');
+                    });
                 }
-                items.forEach(item => {
-                    const kbli = item.kbli || '';
-                    const judul = item.judul || '';
-                    const uraian = item.uraian || '';
 
-                    kbliDetailsCache[kbli] = {
-                        kbli: kbli,
-                        judul,
-                        uraian
-                    };
-                    const isSelected = selectedKBLIs.some(k => k.kbli === kbli);
-                    const btnLabel = isSelected ? 'Dipilih' : 'Pilih';
-                    const btnDisabled = isSelected ? 'disabled' : '';
-                    const btnClass = isSelected ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
-                        'bg-blue-600 text-white hover:bg-blue-700';
-
-                    const row = $(`
-                    <tr data-kbli="${kbli}">
-                        <td class="col-kode">${kbli}</td>
-                        <td class="col-judul kbli-detail-trigger cursor-pointer">${highlightText(judul, query)}</td>
-                        <td class="col-uraian">${highlightText(uraian, query)}</td>
-                        <td class="col-aksi">
-                            <button type="button" class="inline-flex items-center px-3 py-1 text-sm rounded ${btnClass} kbli-select-btn" data-kbli="${kbli}" ${btnDisabled}>${btnLabel}</button>
-                        </td>
-                    </tr>
-                `);
-                    tbody.append(row);
-                });
-            }
-
-            function renderKBLIPagination(data) {
-                const paginationDiv = $('#kbli-pagination');
-                paginationDiv.empty();
-                if (!data || data.total <= data.per_page) return;
-
-                const createPageButton = (page, text, enabled) => {
-                    const btnClass = enabled ?
-                        'bg-white border border-gray-300 text-blue-600 hover:bg-blue-50' :
-                        'bg-gray-100 text-gray-400 cursor-not-allowed';
-                    return `<button type="button" class="px-3 py-1 mx-1 rounded-lg text-sm transition duration-150 kbli-page-btn ${btnClass}" data-page="${page}" ${!enabled ? 'disabled' : ''}>${text}</button>`;
-                };
-
-                paginationDiv.append(createPageButton(data.current_page - 1, 'Previous', data.current_page > 1));
-
-                const maxVisible = 7;
-                let start = Math.max(1, data.current_page - Math.floor(maxVisible / 2));
-                let end = Math.min(data.last_page, start + maxVisible - 1);
-                if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-
-                if (start > 1) {
-                    paginationDiv.append(createPageButton(1, '1', true));
-                    if (start > 2) paginationDiv.append($('<span class="px-2">...</span>'));
-                }
-                for (let i = start; i <= end; i++) {
-                    const isActive = i === data.current_page;
-                    const activeClass = isActive ? 'bg-blue-500 text-white' :
-                        'bg-white border border-gray-300 text-blue-600 hover:bg-blue-50';
-                    paginationDiv.append(
-                        `<button type="button" class="px-3 py-1 mx-1 rounded-lg text-sm transition duration-150 kbli-page-btn ${activeClass}" data-page="${i}">${i}</button>`
-                    );
-                }
-                if (end < data.last_page) {
-                    if (end < data.last_page - 1) paginationDiv.append($('<span class="px-2">...</span>'));
-                    paginationDiv.append(createPageButton(data.last_page, data.last_page, true));
-                }
-                paginationDiv.append(createPageButton(data.current_page + 1, 'Next', data.current_page < data
-                    .last_page));
-            }
-
-            function updateKBLISummary(data) {
-                const summary = $('#kbli-search-summary');
-                if (data && data.data && data.data.length > 0) {
-                    summary.text(`Menampilkan ${data.from} hingga ${data.to} dari ${data.total} hasil`);
-                } else {
-                    summary.text('Menampilkan 0 hingga 0 dari 0 hasil');
-                }
-            }
-
-            function performKBLISearch(query, page = 1, perPage = 25) {
-                const tbody = $('#kbli-results');
-                tbody.html(
-                    '<tr><td colspan="4" class="py-8 text-center"><span class="spinner-border spinner-border-sm mr-2"></span>Memuat data...</td></tr>'
-                );
-
-                // PERUBAHAN: Gunakan URL yang benar
-                const baseUrl = "/api/kbli/search";
-                const url = `${baseUrl}?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
-
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    success: function(data) {
-                        console.log('KBLI data received:', data); // Debug: log data yang diterima
-                        renderKBLIResults(data.data || [], query);
-                        renderKBLIPagination(data);
-                        updateKBLISummary(data);
-                        lastKBLISearchQuery = query;
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading KBLI:', xhr);
-                        console.log('Response text:', xhr.responseText); // Debug: log response text
-                        tbody.html(
-                            `<tr><td colspan="4" class="py-4 text-center text-red-500">Gagal memuat data KBLI. Silakan coba lagi.</td></tr>`
+                function updatePersonIndices(type) {
+                    $(`#${type}-container .person-entry`).each(function (index) {
+                        const $entry = $(this);
+                        $entry.attr('data-index', index);
+                        $entry.find('h4').html(
+                            `<i class="fas fa-user"></i>${type.charAt(0).toUpperCase() + type.slice(1)} #${index + 1}`
                         );
-                        $('#kbli-pagination').empty();
-                        updateKBLISummary({
-                            data: []
+                        $entry.find('input, label').each(function () {
+                            const $el = $(this);
+                            const name = $el.attr('name');
+                            const forAttr = $el.attr('for');
+                            if (name) $el.attr('name', name.replace(/\[\d+\]/, `[${index}]`));
+                            if (forAttr) $el.attr('for', forAttr.replace(/_\d+/, `_${index}`));
                         });
+                    });
+                }
+
+                // --- KBLI FUNCTIONALITY ---
+                function renderKBLIResults(items, query) {
+                    const tbody = $('#kbli-results');
+                    tbody.empty();
+                    if (!items || items.length === 0) {
+                        tbody.html(
+                            `<tr><td colspan="4" class="py-4 text-center text-gray-500">Tidak ada hasil untuk "${query || 'semua data'}"</td></tr>`
+                        );
+                        return;
+                    }
+                    items.forEach(item => {
+                        const kbli = item.kbli || '';
+                        const judul = item.judul || '';
+                        const uraian = item.uraian || '';
+
+                        kbliDetailsCache[kbli] = {
+                            kbli: kbli,
+                            judul,
+                            uraian
+                        };
+                        const isSelected = selectedKBLIs.some(k => k.kbli === kbli);
+                        const btnLabel = isSelected ? 'Dipilih' : 'Pilih';
+                        const btnDisabled = isSelected ? 'disabled' : '';
+                        const btnClass = isSelected ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
+                            'bg-blue-600 text-white hover:bg-blue-700';
+
+                        const row = $(`
+                        <tr data-kbli="${kbli}">
+                            <td class="col-kode">${kbli}</td>
+                            <td class="col-judul kbli-detail-trigger cursor-pointer">${highlightText(judul, query)}</td>
+                            <td class="col-uraian">${highlightText(uraian, query)}</td>
+                            <td class="col-aksi">
+                                <button type="button" class="inline-flex items-center px-3 py-1 text-sm rounded ${btnClass} kbli-select-btn" data-kbli="${kbli}" ${btnDisabled}>${btnLabel}</button>
+                            </td>
+                        </tr>
+                    `);
+                        tbody.append(row);
+                    });
+                }
+
+                function renderKBLIPagination(data) {
+                    const paginationDiv = $('#kbli-pagination');
+                    paginationDiv.empty();
+                    if (!data || data.total <= data.per_page) return;
+
+                    const createPageButton = (page, text, enabled) => {
+                        const btnClass = enabled ?
+                            'bg-white border border-gray-300 text-blue-600 hover:bg-blue-50' :
+                            'bg-gray-100 text-gray-400 cursor-not-allowed';
+                        return `<button type="button" class="px-3 py-1 mx-1 rounded-lg text-sm transition duration-150 kbli-page-btn ${btnClass}" data-page="${page}" ${!enabled ? 'disabled' : ''}>${text}</button>`;
+                    };
+
+                    paginationDiv.append(createPageButton(data.current_page - 1, 'Previous', data.current_page > 1));
+
+                    const maxVisible = 7;
+                    let start = Math.max(1, data.current_page - Math.floor(maxVisible / 2));
+                    let end = Math.min(data.last_page, start + maxVisible - 1);
+                    if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
+
+                    if (start > 1) {
+                        paginationDiv.append(createPageButton(1, '1', true));
+                        if (start > 2) paginationDiv.append($('<span class="px-2">...</span>'));
+                    }
+                    for (let i = start; i <= end; i++) {
+                        const isActive = i === data.current_page;
+                        const activeClass = isActive ? 'bg-blue-500 text-white' :
+                            'bg-white border border-gray-300 text-blue-600 hover:bg-blue-50';
+                        paginationDiv.append(
+                            `<button type="button" class="px-3 py-1 mx-1 rounded-lg text-sm transition duration-150 kbli-page-btn ${activeClass}" data-page="${i}">${i}</button>`
+                        );
+                    }
+                    if (end < data.last_page) {
+                        if (end < data.last_page - 1) paginationDiv.append($('<span class="px-2">...</span>'));
+                        paginationDiv.append(createPageButton(data.last_page, data.last_page, true));
+                    }
+                    paginationDiv.append(createPageButton(data.current_page + 1, 'Next', data.current_page < data
+                        .last_page));
+                }
+
+                function updateKBLISummary(data) {
+                    const summary = $('#kbli-search-summary');
+                    if (data && data.data && data.data.length > 0) {
+                        summary.text(`Menampilkan ${data.from} hingga ${data.to} dari ${data.total} hasil`);
+                    } else {
+                        summary.text('Menampilkan 0 hingga 0 dari 0 hasil');
+                    }
+                }
+
+                function performKBLISearch(query, page = 1, perPage = 25) {
+                    const tbody = $('#kbli-results');
+                    tbody.html(
+                        '<tr><td colspan="4" class="py-8 text-center"><span class="spinner-border spinner-border-sm mr-2"></span>Memuat data...</td></tr>'
+                    );
+
+                    // PERUBAHAN: Gunakan URL yang benar
+                    const baseUrl = "/api/kbli/search";
+                    const url = `${baseUrl}?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
+
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        success: function (data) {
+                            console.log('KBLI data received:', data); // Debug: log data yang diterima
+                            renderKBLIResults(data.data || [], query);
+                            renderKBLIPagination(data);
+                            updateKBLISummary(data);
+                            lastKBLISearchQuery = query;
+                        },
+                        error: function (xhr) {
+                            console.error('Error loading KBLI:', xhr);
+                            console.log('Response text:', xhr.responseText); // Debug: log response text
+                            tbody.html(
+                                `<tr><td colspan="4" class="py-4 text-center text-red-500">Gagal memuat data KBLI. Silakan coba lagi.</td></tr>`
+                            );
+                            $('#kbli-pagination').empty();
+                            updateKBLISummary({
+                                data: []
+                            });
+                        }
+                    });
+                }
+
+                function loadAllKBLIs(page = 1, perPage = 25) {
+                    // PERUBAHAN: Kirim query kosong untuk mendapatkan semua data
+                    performKBLISearch('', page, perPage);
+                }
+
+                // --- EVENT HANDLERS FOR KBLI ---
+                let searchTimeout;
+                $('#kbli-search-input').on('input', function () {
+                    clearTimeout(searchTimeout);
+                    const query = $(this).val().trim();
+                    searchTimeout = setTimeout(() => {
+                        currentKBLIPage = 1;
+                        const perPage = parseInt($('#kbli-per-page').val());
+                        if (query.length >= 3) {
+                            performKBLISearch(query, 1, perPage);
+                        } else {
+                            // PERUBAHAN: Panggil loadAllKBLIs jika query kurang dari 3 karakter
+                            loadAllKBLIs(1, perPage);
+                        }
+                    }, 400);
+                });
+
+                // Enhanced search with suggestions
+                $('#kbli-search-input').on('focus', function () {
+                    const query = $(this).val().trim();
+                    if (query.length >= 3) {
+                        showSearchSuggestions(query);
                     }
                 });
-            }
 
-            function loadAllKBLIs(page = 1, perPage = 25) {
-                // PERUBAHAN: Kirim query kosong untuk mendapatkan semua data
-                performKBLISearch('', page, perPage);
-            }
+                $('#kbli-search-input').on('keydown', function (e) {
+                    const suggestionsContainer = $('#kbli-search-suggestions');
 
-            // --- EVENT HANDLERS FOR KBLI ---
-            let searchTimeout;
-            $('#kbli-search-input').on('input', function() {
-                clearTimeout(searchTimeout);
-                const query = $(this).val().trim();
-                searchTimeout = setTimeout(() => {
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, searchSuggestions.length -
+                            1);
+                        updateActiveSuggestion();
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+                        updateActiveSuggestion();
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < searchSuggestions.length) {
+                            $(this).val(searchSuggestions[activeSuggestionIndex]);
+                            suggestionsContainer.hide();
+                            performKBLISearch(searchSuggestions[activeSuggestionIndex], 1, parseInt($(
+                                '#kbli-per-page').val()));
+                        } else {
+                            const query = $(this).val().trim();
+                            if (query.length >= 3) {
+                                performKBLISearch(query, 1, parseInt($('#kbli-per-page').val()));
+                            }
+                        }
+                    } else if (e.key === 'Escape') {
+                        suggestionsContainer.hide();
+                    }
+                });
+
+                function showSearchSuggestions(query) {
+                    // In a real implementation, you would fetch suggestions from the server
+                    // For now, we'll use a mock implementation
+                    searchSuggestions = [
+                        query + ' suggestion 1',
+                        query + ' suggestion 2',
+                        query + ' suggestion 3'
+                    ];
+
+                    const suggestionsContainer = $('#kbli-search-suggestions');
+                    suggestionsContainer.empty();
+
+                    searchSuggestions.forEach((suggestion, index) => {
+                        const suggestionElement = $(`<div class="search-suggestion">${suggestion}</div>`);
+                        suggestionElement.on('click', function () {
+                            $('#kbli-search-input').val(suggestion);
+                            suggestionsContainer.hide();
+                            performKBLISearch(suggestion, 1, parseInt($('#kbli-per-page').val()));
+                        });
+                        suggestionsContainer.append(suggestionElement);
+                    });
+
+                    suggestionsContainer.show();
+                    activeSuggestionIndex = -1;
+                }
+
+                function updateActiveSuggestion() {
+                    const suggestions = $('.search-suggestion');
+                    suggestions.removeClass('active');
+
+                    if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
+                        $(suggestions[activeSuggestionIndex]).addClass('active');
+                    }
+                }
+
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.search-container').length) {
+                        $('#kbli-search-suggestions').hide();
+                    }
+                });
+
+                $('#kbli-per-page').on('change', function () {
+                    const perPage = parseInt($(this).val());
+                    const query = $('#kbli-search-input').val().trim();
                     currentKBLIPage = 1;
-                    const perPage = parseInt($('#kbli-per-page').val());
                     if (query.length >= 3) {
                         performKBLISearch(query, 1, perPage);
                     } else {
-                        // PERUBAHAN: Panggil loadAllKBLIs jika query kurang dari 3 karakter
                         loadAllKBLIs(1, perPage);
                     }
-                }, 400);
-            });
+                });
 
-            // Enhanced search with suggestions
-            $('#kbli-search-input').on('focus', function() {
-                const query = $(this).val().trim();
-                if (query.length >= 3) {
-                    showSearchSuggestions(query);
-                }
-            });
+                $(document).on('click', '.kbli-select-btn', function () {
+                    const kbli = $(this).data('kbli');
+                    if (!$(this).prop('disabled')) {
+                        addKBLI(kbli);
+                    }
+                });
 
-            $('#kbli-search-input').on('keydown', function(e) {
-                const suggestionsContainer = $('#kbli-search-suggestions');
+                $(document).on('click', '.kbli-detail-trigger', function () {
+                    const kbli = $(this).closest('tr').data('kbli');
+                    showKBLIDetailModal(kbli);
+                });
 
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, searchSuggestions.length -
-                        1);
-                    updateActiveSuggestion();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
-                    updateActiveSuggestion();
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (activeSuggestionIndex >= 0 && activeSuggestionIndex < searchSuggestions.length) {
-                        $(this).val(searchSuggestions[activeSuggestionIndex]);
-                        suggestionsContainer.hide();
-                        performKBLISearch(searchSuggestions[activeSuggestionIndex], 1, parseInt($(
-                            '#kbli-per-page').val()));
-                    } else {
-                        const query = $(this).val().trim();
+                $(document).on('click', '.kbli-page-btn', function () {
+                    const page = $(this).data('page');
+                    if (page !== undefined && !$(this).prop('disabled')) {
+                        currentKBLIPage = page;
+                        const query = $('#kbli-search-input').val().trim();
+                        const perPage = parseInt($('#kbli-per-page').val());
                         if (query.length >= 3) {
-                            performKBLISearch(query, 1, parseInt($('#kbli-per-page').val()));
+                            performKBLISearch(query, page, perPage);
+                        } else {
+                            loadAllKBLIs(page, perPage);
                         }
                     }
-                } else if (e.key === 'Escape') {
-                    suggestionsContainer.hide();
-                }
-            });
-
-            function showSearchSuggestions(query) {
-                // In a real implementation, you would fetch suggestions from the server
-                // For now, we'll use a mock implementation
-                searchSuggestions = [
-                    query + ' suggestion 1',
-                    query + ' suggestion 2',
-                    query + ' suggestion 3'
-                ];
-
-                const suggestionsContainer = $('#kbli-search-suggestions');
-                suggestionsContainer.empty();
-
-                searchSuggestions.forEach((suggestion, index) => {
-                    const suggestionElement = $(`<div class="search-suggestion">${suggestion}</div>`);
-                    suggestionElement.on('click', function() {
-                        $('#kbli-search-input').val(suggestion);
-                        suggestionsContainer.hide();
-                        performKBLISearch(suggestion, 1, parseInt($('#kbli-per-page').val()));
-                    });
-                    suggestionsContainer.append(suggestionElement);
                 });
 
-                suggestionsContainer.show();
-                activeSuggestionIndex = -1;
-            }
-
-            function updateActiveSuggestion() {
-                const suggestions = $('.search-suggestion');
-                suggestions.removeClass('active');
-
-                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
-                    $(suggestions[activeSuggestionIndex]).addClass('active');
+                // --- KBLI SELECTION & REMOVAL ---
+                function addKBLI(kbli) {
+                    if (!kbliDetailsCache[kbli] || selectedKBLIs.some(k => k.kbli === kbli)) return;
+                    selectedKBLIs.push(kbliDetailsCache[kbli]);
+                    updateSelectedKBLIList();
+                    updateFinancialSummary();
+                    $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Dipilih').prop('disabled', true)
+                        .removeClass('bg-blue-600 text-white hover:bg-blue-700').addClass(
+                            'bg-gray-300 text-gray-700 cursor-not-allowed');
+                    localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
                 }
-            }
 
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.search-container').length) {
-                    $('#kbli-search-suggestions').hide();
-                }
-            });
-
-            $('#kbli-per-page').on('change', function() {
-                const perPage = parseInt($(this).val());
-                const query = $('#kbli-search-input').val().trim();
-                currentKBLIPage = 1;
-                if (query.length >= 3) {
-                    performKBLISearch(query, 1, perPage);
-                } else {
-                    loadAllKBLIs(1, perPage);
-                }
-            });
-
-            $(document).on('click', '.kbli-select-btn', function() {
-                const kbli = $(this).data('kbli');
-                if (!$(this).prop('disabled')) {
-                    addKBLI(kbli);
-                }
-            });
-
-            $(document).on('click', '.kbli-detail-trigger', function() {
-                const kbli = $(this).closest('tr').data('kbli');
-                showKBLIDetailModal(kbli);
-            });
-
-            $(document).on('click', '.kbli-page-btn', function() {
-                const page = $(this).data('page');
-                if (page !== undefined && !$(this).prop('disabled')) {
-                    currentKBLIPage = page;
-                    const query = $('#kbli-search-input').val().trim();
-                    const perPage = parseInt($('#kbli-per-page').val());
-                    if (query.length >= 3) {
-                        performKBLISearch(query, page, perPage);
-                    } else {
-                        loadAllKBLIs(page, perPage);
+                function removeKBLI(kbli) {
+                    selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli);
+                    updateSelectedKBLIList();
+                    updateFinancialSummary();
+                    $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Pilih').prop('disabled', false)
+                        .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed').addClass(
+                            'bg-blue-600 text-white hover:bg-blue-700');
+                    // Jika jumlah sekarang kurang dari batas, aktifkan kembali tombol 'Pilih' yang belum dipilih
+                    if (selectedKBLIs.length < MAX_KBLI_FREE) {
+                        $('.kbli-select-btn').each(function () {
+                            const btnKbli = $(this).data('kbli');
+                            if (!selectedKBLIs.some(k => k.kbli === btnKbli)) {
+                                $(this).text('Pilih').prop('disabled', false)
+                                    .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed')
+                                    .addClass('bg-blue-600 text-white hover:bg-blue-700');
+                            }
+                        });
                     }
+                    localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
                 }
-            });
 
-            // --- KBLI SELECTION & REMOVAL ---
-            function addKBLI(kbli) {
-                if (!kbliDetailsCache[kbli] || selectedKBLIs.some(k => k.kbli === kbli)) return;
-                selectedKBLIs.push(kbliDetailsCache[kbli]);
-                updateSelectedKBLIList();
-                updateFinancialSummary();
-                $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Dipilih').prop('disabled', true)
-                    .removeClass('bg-blue-600 text-white hover:bg-blue-700').addClass(
-                        'bg-gray-300 text-gray-700 cursor-not-allowed');
-                localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
-            }
+                function updateSelectedKBLIList() {
+                    const tbody = $('#selected-kbli-body');
+                    $('#selected-kbli-count').text(selectedKBLIs.length);
 
-            function removeKBLI(kbli) {
-                selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli);
-                updateSelectedKBLIList();
-                updateFinancialSummary();
-                $(`tr[data-kbli="${kbli}"] button.kbli-select-btn`).text('Pilih').prop('disabled', false)
-                    .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed').addClass(
-                        'bg-blue-600 text-white hover:bg-blue-700');
-                // Jika jumlah sekarang kurang dari batas, aktifkan kembali tombol 'Pilih' yang belum dipilih
-                if (selectedKBLIs.length < MAX_KBLI_FREE) {
-                    $('.kbli-select-btn').each(function() {
-                        const btnKbli = $(this).data('kbli');
-                        if (!selectedKBLIs.some(k => k.kbli === btnKbli)) {
-                            $(this).text('Pilih').prop('disabled', false)
-                                .removeClass('bg-gray-300 text-gray-700 cursor-not-allowed')
-                                .addClass('bg-blue-600 text-white hover:bg-blue-700');
+                    if (selectedKBLIs.length === 0) {
+                        tbody.html(
+                            `<tr><td colspan="5" class="py-4 text-center text-gray-500">Belum ada KBLI yang dipilih.</td></tr>`
+                        );
+                        return;
+                    }
+
+                    tbody.empty();
+                    selectedKBLIs.forEach((kbli, index) => {
+                        const row = $(`
+                        <tr>
+                            <td class="col-kode">${index + 1}</td>
+                            <td class="col-kode">${kbli.kbli}</td>
+                            <td class="col-judul">${kbli.judul}</td>
+                            <td class="col-uraian">${kbli.uraian}</td>
+                            <td class="col-aksi">
+                                <button type="button" class="text-red-600 hover:text-red-900 kbli-remove-btn" data-kbli="${kbli.kbli}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                        tbody.append(row);
+                    });
+                    $('#kbli_selected').val(JSON.stringify(selectedKBLIs));
+                }
+
+                $(document).on('click', '.kbli-remove-btn', function () {
+                    const kbli = $(this).data('kbli');
+                    removeKBLI(kbli);
+                });
+
+                // Document option radio change
+                $(document).on('change', 'input[name="kbli_doc_option_radio"]', function () {
+                    const val = $(this).val();
+                    $('#kbli_doc_option').val(val);
+                    kbliDocOption = val;
+                    updateFinancialSummary();
+                });
+
+                // Update submission summary to include doc costs
+                function updateSubmissionSummary() {
+                    const namaPerusahaan = $('#nama_perusahaan').val();
+                    const provinceText = $('#province option:selected').text();
+                    const cityText = $('#city option:selected').text();
+                    const direkturCount = $('#direktur-container .person-entry').length;
+                    const komisarisCount = $('#komisaris-container .person-entry').length;
+                    const kbliCount = selectedKBLIs.length;
+                    const bankName = selectedBank || 'Belum dipilih';
+
+                    let summaryHTML = `
+                    <p><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</p>
+                    <p><strong>Lokasi:</strong> ${provinceText}, ${cityText}</p>
+                    <p><strong>Jumlah Direktur:</strong> ${direkturCount}</p>
+                    <p><strong>Jumlah Komisaris:</strong> ${komisarisCount}</p>
+                    <p><strong>Jumlah KBLI:</strong> ${kbliCount}</p>
+                    <p><strong>Rekanan Bank:</strong> ${bankName}</p>
+                `;
+
+                    if (kbliCount > 0) {
+                        const excessCount = Math.max(0, kbliCount - MAX_KBLI_FREE);
+
+                        // First 5 KBLI are free (Rp0). Charges apply only when count > MAX_KBLI_FREE
+                        if (kbliCount <= MAX_KBLI_FREE) {
+                            // No additional charges
+                            summaryHTML += `<p class="mt-2"><strong>Rincian Biaya:</strong> Rp0 (hingga ${MAX_KBLI_FREE} KBLI gratis)</p>`;
+                            summaryHTML += `<p class="text-xl font-extrabold mt-2"><strong>Total Biaya Tambahan:</strong> Rp0</p>`;
+                        } else {
+                            const docOption = $('#kbli_doc_option').val() || 'both';
+                            const perUnit = (docOption === 'akta') ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
+                            let parts = [];
+                            if (docOption === 'akta') {
+                                parts.push(`Akta Rp${AKTA_FEE.toLocaleString('id-ID')}`);
+                            } else {
+                                parts.push(`Akta Rp${AKTA_FEE.toLocaleString('id-ID')}`, `NIB Rp${NIB_FEE.toLocaleString('id-ID')}`);
+                            }
+
+                            const totalCharge = excessCount * perUnit;
+                            summaryHTML += `<p class="mt-2"><strong>Rincian Biaya per Unit:</strong> ${parts.join(', ')}</p>`;
+                            summaryHTML += `<p class="mt-1">Kelebihan: <strong>${excessCount} × Rp${perUnit.toLocaleString('id-ID')} = Rp${totalCharge.toLocaleString('id-ID')}</strong></p>`;
+                            summaryHTML += `<p class="text-xl font-extrabold mt-2"><strong>Total Biaya Tambahan:</strong> Rp${totalCharge.toLocaleString('id-ID')}</p>`;
                         }
-                    });
-                }
-                localStorage.setItem('selectedKBLIs', JSON.stringify(selectedKBLIs));
-            }
-
-            function updateSelectedKBLIList() {
-                const tbody = $('#selected-kbli-body');
-                $('#selected-kbli-count').text(selectedKBLIs.length);
-
-                if (selectedKBLIs.length === 0) {
-                    tbody.html(
-                        `<tr><td colspan="5" class="py-4 text-center text-gray-500">Belum ada KBLI yang dipilih.</td></tr>`
-                    );
-                    return;
-                }
-
-                tbody.empty();
-                selectedKBLIs.forEach((kbli, index) => {
-                    const row = $(`
-                    <tr>
-                        <td class="col-kode">${index + 1}</td>
-                        <td class="col-kode">${kbli.kbli}</td>
-                        <td class="col-judul">${kbli.judul}</td>
-                        <td class="col-uraian">${kbli.uraian}</td>
-                        <td class="col-aksi">
-                            <button type="button" class="text-red-600 hover:text-red-900 kbli-remove-btn" data-kbli="${kbli.kbli}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `);
-                    tbody.append(row);
-                });
-                $('#kbli_selected').val(JSON.stringify(selectedKBLIs));
-            }
-
-            $(document).on('click', '.kbli-remove-btn', function() {
-                const kbli = $(this).data('kbli');
-                removeKBLI(kbli);
-            });
-
-            // Document option radio change
-            $(document).on('change', 'input[name="kbli_doc_option_radio"]', function() {
-                const val = $(this).val();
-                $('#kbli_doc_option').val(val);
-                kbliDocOption = val;
-                updateFinancialSummary();
-            });
-
-            // Update submission summary to include doc costs
-            function updateSubmissionSummary() {
-                const namaPerusahaan = $('#nama_perusahaan').val();
-                const provinceText = $('#province option:selected').text();
-                const cityText = $('#city option:selected').text();
-                const direkturCount = $('#direktur-container .person-entry').length;
-                const komisarisCount = $('#komisaris-container .person-entry').length;
-                const kbliCount = selectedKBLIs.length;
-                const bankName = selectedBank || 'Belum dipilih';
-
-                let summaryHTML = `
-                <p><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</p>
-                <p><strong>Lokasi:</strong> ${provinceText}, ${cityText}</p>
-                <p><strong>Jumlah Direktur:</strong> ${direkturCount}</p>
-                <p><strong>Jumlah Komisaris:</strong> ${komisarisCount}</p>
-                <p><strong>Jumlah KBLI:</strong> ${kbliCount}</p>
-                <p><strong>Rekanan Bank:</strong> ${bankName}</p>
-            `;
-
-                if (kbliCount > 0) {
-                    const excessCount = Math.max(0, kbliCount - MAX_KBLI_FREE);
-                    const docOption = $('#kbli_doc_option').val() || 'both';
-                    const perUnit = (docOption === 'akta') ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
-                    const totalCharge = excessCount * perUnit;
-
-                    summaryHTML += `<p class="mt-2"><strong>Rincian Biaya per Unit:</strong> ${docOption === 'akta' ? 'Akta Rp' + AKTA_FEE.toLocaleString('id-ID') : 'Akta Rp' + AKTA_FEE.toLocaleString('id-ID') + ', NIB Rp' + NIB_FEE.toLocaleString('id-ID')}</p>`;
-                    summaryHTML += `<p class="mt-1">Kelebihan: <strong>${excessCount} × Rp${perUnit.toLocaleString('id-ID')} = Rp${totalCharge.toLocaleString('id-ID')}</strong></p>`;
-                    summaryHTML += `<p class="text-xl font-extrabold mt-2"><strong>Total Biaya Tambahan:</strong> Rp${totalCharge.toLocaleString('id-ID')}</p>`;
-                }
-                $('#submission-summary').html(summaryHTML);
-            }
-
-                let includeAkta = true;
-                let includeNib = false;
-
-                if (count === 0) {
-                    $('#kbli-doc-options').addClass('hidden');
-                    $('#kbli_doc_option').val('both');
-                    $('#include_akta').val(0);
-                    $('#include_nib').val(0);
-                } else if (count <= MAX_KBLI_FREE) {
-                    // Up to free limit: both required
-                    $('#kbli-doc-options').addClass('hidden');
-                    $('#kbli_doc_option').val('both');
-                    includeAkta = true;
-                    includeNib = true;
-                    $('#include_akta').val(1);
-                    $('#include_nib').val(1);
-                } else {
-                    $('#kbli-doc-options').removeClass('hidden');
-                    let opt = $('#kbli_doc_option').val();
-                    if (!opt) {
-                        opt = kbliDocOption || 'both';
-                        $('#kbli_doc_option').val(opt);
-                        $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
-                    } else {
-                        $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
                     }
-                    kbliDocOption = opt;
-                    includeAkta = true;
-                    includeNib = (opt === 'both');
-                    $('#include_akta').val(includeAkta ? 1 : 0);
-                    $('#include_nib').val(includeNib ? 1 : 0);
+                    $('#submission-summary').html(summaryHTML);
                 }
 
-                const docCost = (includeAkta ? AKTA_FEE : 0) + (includeNib ? NIB_FEE : 0);
-                const totalCharge = (count <= MAX_KBLI_FREE) ? 0 : docCost;
+                function updateFinancialSummary() {
+                    const count = selectedKBLIs.length;
+                    const excessCount = Math.max(0, count - MAX_KBLI_FREE);
+                    let includeAkta = false;
+                    let includeNib = false;
 
-                $('#excess-kbli-count').text(`${excessCount} Kode`);
-                let breakdownParts = [];
-                if (includeAkta) breakdownParts.push(`Akta: Rp${AKTA_FEE.toLocaleString('id-ID')}`);
-                if (includeNib) breakdownParts.push(`NIB: Rp${NIB_FEE.toLocaleString('id-ID')}`);
+                    if (count === 0) {
+                        $('#kbli-doc-options').addClass('hidden');
+                        $('#kbli_doc_option').val('');
+                        $('#include_akta').val(0);
+                        $('#include_nib').val(0);
+                    } else if (count <= MAX_KBLI_FREE) {
+                        // First 5 KBLI are free (Rp0)
+                        $('#kbli-doc-options').addClass('hidden');
+                        $('#kbli_doc_option').val('');
+                        includeAkta = false;
+                        includeNib = false;
+                        $('#include_akta').val(0);
+                        $('#include_nib').val(0);
+                    } else {
+                        // More than free limit: show options and apply charges
+                        $('#kbli-doc-options').removeClass('hidden');
+                        let opt = $('#kbli_doc_option').val();
+                        if (!opt) {
+                            opt = kbliDocOption || 'both';
+                            $('#kbli_doc_option').val(opt);
+                            $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
+                        } else {
+                            $(`input[name="kbli_doc_option_radio"][value="${opt}"]`).prop('checked', true);
+                        }
+                        kbliDocOption = opt;
+                        includeAkta = true;
+                        includeNib = (opt === 'both');
+                        $('#include_akta').val(includeAkta ? 1 : 0);
+                        $('#include_nib').val(includeNib ? 1 : 0);
+                    }
 
-                $('#kbli-cost-breakdown').text(breakdownParts.join(', ') || '-');
-                $('#total-kbli-charge').text(`Rp${totalCharge.toLocaleString('id-ID')}`);
-            }
+                    const perUnit = (includeAkta ? AKTA_FEE : 0) + (includeNib ? NIB_FEE : 0);
+                    const totalCharge = (count <= MAX_KBLI_FREE) ? 0 : (excessCount * perUnit);
 
-            function showKBLIDetailModal(kbli) {
-                if (!kbliDetailsCache[kbli]) return;
-                const kbliData = kbliDetailsCache[kbli];
-                if ($('#kbli-detail-modal').length === 0) {
-                    $('body').append(`
-                    <div id="kbli-detail-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-                        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white modal-content">
-                            <div class="mt-3">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 text-center">Detail KBLI</h3>
-                                <div class="mt-2 px-7 py-3">
-                                    <p class="text-sm text-gray-700"><strong>Kode:</strong> <span id="modal-kode"></span></p>
-                                    <p class="text-sm text-gray-700 mt-2"><strong>Judul:</strong> <span id="modal-judul"></span></p>
-                                    <p class="text-sm text-gray-700 mt-2"><strong>Uraian:</strong></p>
-                                    <p class="text-sm text-gray-600 mt-1" id="modal-uraian"></p>
-                                </div>
-                                <div class="items-center px-4 py-3">
-                                    <button id="close-modal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">Tutup</button>
+                    $('#excess-kbli-count').text(`${excessCount} Kode`);
+                    let breakdownParts = [];
+                    if (count > MAX_KBLI_FREE) {
+                        if (includeAkta) breakdownParts.push(`Akta: Rp${AKTA_FEE.toLocaleString('id-ID')}`);
+                        if (includeNib) breakdownParts.push(`NIB: Rp${NIB_FEE.toLocaleString('id-ID')}`);
+
+                    }
+                    $('#kbli-cost-breakdown').text(breakdownParts.join(', ') || '-');
+                    $('#total-kbli-charge').text(`Rp${totalCharge.toLocaleString('id-ID')}`);
+                }
+
+                function showKBLIDetailModal(kbli) {
+                    if (!kbliDetailsCache[kbli]) return;
+                    const kbliData = kbliDetailsCache[kbli];
+                    if ($('#kbli-detail-modal').length === 0) {
+                        $('body').append(`
+                        <div id="kbli-detail-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+                            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white modal-content">
+                                <div class="mt-3">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 text-center">Detail KBLI</h3>
+                                    <div class="mt-2 px-7 py-3">
+                                        <p class="text-sm text-gray-700"><strong>Kode:</strong> <span id="modal-kode"></span></p>
+                                        <p class="text-sm text-gray-700 mt-2"><strong>Judul:</strong> <span id="modal-judul"></span></p>
+                                        <p class="text-sm text-gray-700 mt-2"><strong>Uraian:</strong></p>
+                                        <p class="text-sm text-gray-600 mt-1" id="modal-uraian"></p>
+                                    </div>
+                                    <div class="items-center px-4 py-3">
+                                        <button id="close-modal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">Tutup</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `);
-                    $(document).on('click', '#close-modal, #kbli-detail-modal', function(e) {
-                        if (e.target === this) $('#kbli-detail-modal').addClass('hidden');
+                    `);
+                        $(document).on('click', '#close-modal, #kbli-detail-modal', function (e) {
+                            if (e.target === this) $('#kbli-detail-modal').addClass('hidden');
+                        });
+                    }
+                    $('#modal-kode').text(kbliData.kbli);
+                    $('#modal-judul').text(kbliData.judul);
+                    $('#modal-uraian').text(kbliData.uraian);
+                    $('#kbli-detail-modal').removeClass('hidden');
+                }
+
+                // --- FINAL FORM SUBMISSION ---
+                $('#pendirian-pt-form').on('submit', function (e) {
+                    e.preventDefault();
+
+                    // Validate all steps before submission
+                    let allValid = true;
+                    for (let i = 1; i <= 5; i++) {
+                        if (!validateStep(i)) {
+                            allValid = false;
+                            showStep(i);
+                            updateProgressIndicator(i);
+                            updateNavigationButtons(i);
+                            break;
+                        }
+                    }
+
+                    if (!allValid) return;
+
+                    const submitBtn = $('#next-step-btn'); // Tombol submit sekarang adalah tombol next
+                    const originalText = submitBtn.html();
+                    submitBtn.prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
+
+                    const formData = new FormData(this);
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            showToast('Pengajuan pendirian pt berhasil dikirim!', 'success');
+                            localStorage.removeItem('selectedKBLIs');
+                            setTimeout(() => {
+                                window.location.href = response.redirect || '/dashboard';
+                            }, 2000);
+                        },
+                        error: function (xhr) {
+                            let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
+                                    '<br>');
+                            }
+                            showToast(errorMessage, 'error');
+                            submitBtn.prop('disabled', false).html(originalText);
+                        }
+                    });
+                });
+
+                // Update posisi sticky bar saat resize
+                function updateStickyBarWidth() {
+                    const bar = $('.progress-sticky-bar');
+
+                    // Tetap berada di tengah secara otomatis
+                    bar.css({
+                        left: '50%',
+                        transform: 'translateX(-50%)'
                     });
                 }
-                $('#modal-kode').text(kbliData.kbli);
-                $('#modal-judul').text(kbliData.judul);
-                $('#modal-uraian').text(kbliData.uraian);
-                $('#kbli-detail-modal').removeClass('hidden');
-            }
 
-            // --- FINAL FORM SUBMISSION ---
-            $('#pendirian-PT-form').on('submit', function(e) {
-                e.preventDefault();
+                // Jalankan saat load & saat resize
+                $(document).ready(updateStickyBarWidth);
+                $(window).resize(updateStickyBarWidth);
 
-                // Validate all steps before submission
-                let allValid = true;
-                for (let i = 1; i <= 5; i++) {
-                    if (!validateStep(i)) {
-                        allValid = false;
-                        showStep(i);
-                        updateProgressIndicator(i);
-                        updateNavigationButtons(i);
-                        break;
-                    }
-                }
 
-                if (!allValid) return;
-
-                const submitBtn = $('#next-step-btn'); // Tombol submit sekarang adalah tombol next
-                const originalText = submitBtn.html();
-                submitBtn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
-
-                const formData = new FormData(this);
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        showToast('Pengajuan pendirian PT berhasil dikirim!', 'success');
-                        localStorage.removeItem('selectedKBLIs');
-                        setTimeout(() => {
-                            window.location.href = response.redirect || '/dashboard';
-                        }, 2000);
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                '<br>');
-                        }
-                        showToast(errorMessage, 'error');
-                        submitBtn.prop('disabled', false).html(originalText);
-                    }
+                // Event listener untuk resize window (dengan debounce)
+                let resizeTimeout;
+                $(window).on('resize', function () {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(function () {
+                        updateStickyBarWidth();
+                    }, 250); // Debounce selama 250ms untuk performa
                 });
+
+
+                // --- START THE APP ---
+                initializeApp();
             });
-
-            // Update posisi sticky bar saat resize
-            function updateStickyBarWidth() {
-                const bar = $('.progress-sticky-bar');
-
-                // Tetap berada di tengah secara otomatis
-                bar.css({
-                    left: '50%',
-                    transform: 'translateX(-50%)'
-                });
-            }
-
-            // Jalankan saat load & saat resize
-            $(document).ready(updateStickyBarWidth);
-            $(window).resize(updateStickyBarWidth);
-
-
-            // Event listener untuk resize window (dengan debounce)
-            let resizeTimeout;
-            $(window).on('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(function() {
-                    updateStickyBarWidth();
-                }, 250); // Debounce selama 250ms untuk performa
-            });
-
-
-            // --- START THE APP ---
-            initializeApp();
-        });
-    </script>
-</body>
-
-</html>
+        </script>
 @endsection
