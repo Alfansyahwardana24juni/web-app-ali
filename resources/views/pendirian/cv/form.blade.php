@@ -386,6 +386,12 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
+        .form-input:disabled {
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
         .form-help {
             font-size: 0.8rem;
             color: #6b7280;
@@ -1358,6 +1364,8 @@
                             dropdown.append('<option value="' + key + '">' + value + '</option>');
                         });
                     }
+                    // Trigger change untuk update UI
+                    dropdown.trigger('change');
                 };
 
                 // Fungsi untuk melakukan fetch data
@@ -1379,6 +1387,7 @@
                             id: id
                         },
                         success: function(data) {
+                            console.log('Data fetched:', url, data);
                             populateDropdown(targetDropdown, data);
                             targetDropdown.prop('disabled', false);
                         },
@@ -1394,7 +1403,9 @@
                     url: '{{ route("provinces") }}',
                     type: 'GET',
                     success: function(data) {
+                        console.log('Provinces loaded:', data);
                         populateDropdown(provinceSelect, data);
+                        provinceSelect.prop('disabled', false);
                     },
                     error: function(xhr) {
                         console.error('Error loading provinces:', xhr);
@@ -1405,26 +1416,34 @@
                 // Event Listener untuk Provinsi
                 provinceSelect.on('change', function() {
                     const provinceId = $(this).val();
-                    fetchData('{{ route("cities") }}', provinceId, citySelect, [districtSelect,
-                        villageSelect
-                    ]);
-                    // Update bank options when province changes
-                    updateBankOptions();
+                    console.log('Province selected:', provinceId);
+                    if (provinceId) {
+                        fetchData('{{ route("cities") }}', provinceId, citySelect, [districtSelect,
+                            villageSelect
+                        ]);
+                        // Update bank options when province changes
+                        updateBankOptions();
+                    }
                 });
 
                 // Event Listener untuk Kota
                 citySelect.on('change', function() {
                     const cityId = $(this).val();
-                    fetchData('{{ route("districts") }}', cityId, districtSelect, [villageSelect]);
-                    // Update bank options when city changes
-                    updateBankOptions();
+                    console.log('City selected:', cityId);
+                    if (cityId) {
+                        fetchData('{{ route("districts") }}', cityId, districtSelect, [villageSelect]);
+                        // Update bank options when city changes
+                        updateBankOptions();
+                    }
                 });
 
-                // PERBAIKAN: Event Listener untuk Kecamatan - ini yang diperbaiki
+                // Event Listener untuk Kecamatan
                 districtSelect.on('change', function() {
                     const districtId = $(this).val();
-                    console.log('District changed:', districtId); // Debug log
-                    fetchData('{{ route("villages") }}', districtId, villageSelect, []);
+                    console.log('District selected:', districtId);
+                    if (districtId) {
+                        fetchData('{{ route("villages") }}', districtId, villageSelect, []);
+                    }
                 });
             }
 
@@ -1438,18 +1457,20 @@
                 const nameEl = $('#payment-proof-name');
                 const sizeEl = $('#payment-proof-size');
 
-                // PERBAIKAN: Event listener untuk tombol "Pilih File"
+                // Direct click handler untuk tombol - paling penting
                 btn.on('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Upload button clicked'); // Debug log
-                    input.click();
+                    // Gunakan native JavaScript untuk memastikan file dialog terbuka
+                    document.getElementById('payment_proof').click();
+                    return false;
                 });
 
-                // Click on container to trigger file input
+                // Click pada container (bukan pada tombol atau elemen interaktif lainnya)
                 container.on('click', function(e) {
-                    // Jangan trigger jika yang diklik adalah tombol
-                    if (!$(e.target).is('#upload-payment-proof-btn')) {
+                    // Abaikan click jika target adalah tombol atau child dari tombol
+                    const target = $(e.target);
+                    if (target.closest('button').length === 0) {
                         input.click();
                     }
                 });
@@ -1485,10 +1506,13 @@
                 });
 
                 // Handle file removal
-                removeBtn.on('click', function() {
+                removeBtn.on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     input.val('');
                     preview.addClass('hidden');
                     container.removeClass('has-file');
+                    return false;
                 });
 
                 // Drag and drop functionality
