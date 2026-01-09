@@ -1078,28 +1078,67 @@
                             </div>
                         </div>
 
-                        <div class="warning-box">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h3 class="text-lg font-bold mb-2">Informasi Biaya Tambahan KBLI</h3>
-                                <p class="text-sm">Batas Gratis: <span class="font-semibold">5 KBLI</span></p>
+                        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm p-5 mb-6">
+    <div class="flex items-start gap-4">
+        
+        <div class="flex-shrink-0 text-amber-500 mt-1">
+            <i class="fas fa-exclamation-triangle fa-lg"></i>
+        </div>
 
-                                <p class="text-sm">Untuk hingga 5 KBLI, <strong>Akta Notaris</strong> (Rp15.000) <strong>dan</strong> <strong>NIB</strong> (Rp100.000) <em>wajib</em>.</p>
+        <div class="w-full">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Informasi Biaya Tambahan KBLI</h3>
+            
+            <div class="inline-flex items-center bg-white border border-amber-200 rounded-md px-3 py-1 mb-3 shadow-sm">
+                <span class="text-xs text-gray-500 uppercase tracking-wide font-bold mr-2">Batas Gratis</span>
+                <span class="text-sm font-bold text-amber-700">5 KBLI</span>
+            </div>
 
-                                <div id="kbli-doc-options" class="mt-2 hidden">
-                                    <p class="text-sm font-semibold mb-1">Pilihan untuk Kelebihan KBLI (&gt;5):</p>
-                                    <label class="inline-flex items-center mr-4"><input type="radio" name="kbli_doc_option_radio" value="akta"> <span class="ml-2">Akta saja (Rp15.000)</span></label>
-                                    <label class="inline-flex items-center"><input type="radio" name="kbli_doc_option_radio" value="both" checked> <span class="ml-2">Akta + NIB (Rp15.000 + Rp100.000)</span></label>
-                                    <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="">
-                                    <input type="hidden" id="include_akta" name="include_akta" value="0">
-                                    <input type="hidden" id="include_nib" name="include_nib" value="0">
-                                </div>
+            <p class="text-sm text-gray-600 leading-relaxed mb-3">
+               <span class="text-amber-700 font-bold italic">*</span> dokumen <strong class="text-gray-800">Akta Notaris</strong> (Rp15.000) dan <strong class="text-gray-800">NIB</strong> (Rp100.000) bersifat <span class="text-amber-700 font-bold italic">wajib</span>.
+            </p>
 
-                                <p class="text-sm mt-2">Kelebihan: <span id="excess-kbli-count" class="font-semibold">0 Kode</span></p>
-                                <p class="text-sm">Rincian: <span id="kbli-cost-breakdown" class="font-semibold">-</span></p>
-                                <p class="text-xl font-extrabold mt-2">Total Biaya Tambahan: <span id="total-kbli-charge">Rp0</span></p>
-                            </div>
-                        </div> 
+            <div id="kbli-doc-options" class="mt-4 p-4 bg-white rounded-lg border border-amber-100 hidden">
+                <p class="text-sm font-semibold text-gray-700 mb-3 block">
+                    Pilihan untuk Kelebihan KBLI (>5):
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <input type="radio" name="kbli_doc_option_radio" value="akta" class="mt-1 h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                        <div class="ml-3">
+                            <span class="block text-sm font-medium text-gray-900">Akta Saja</span>
+                            <span class="block text-xs text-gray-500 font-mono mt-1">Rp15.000</span>
+                        </div>
+                    </label>
+
+                    <label class="relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <input type="radio" name="kbli_doc_option_radio" value="both" checked class="mt-1 h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                        <div class="ml-3">
+                            <span class="block text-sm font-medium text-gray-900">Akta + NIB</span>
+                            <span class="block text-xs text-gray-500 font-mono mt-1">Rp15.000 + Rp100.000</span>
+                        </div>
+                    </label>
+                </div>
+
+                <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="">
+                <input type="hidden" id="include_akta" name="include_akta" value="0">
+                <input type="hidden" id="include_nib" name="include_nib" value="0">
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-amber-200/60 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p>Kelebihan: <span id="excess-kbli-count" class="font-bold text-gray-800">0 KBLI</span></p>
+                    <p>Rincian: <span id="kbli-cost-breakdown" class="font-medium">-</span></p>
+                </div>
+                
+                <div class="text-right bg-white/50 px-3 py-2 rounded-lg">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Total Biaya Tambahan</p>
+                    <p class="text-2xl font-extrabold text-amber-700" id="total-kbli-charge">Rp0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
 
                         <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
 
@@ -2271,7 +2310,7 @@
                 const perUnit = (includeAkta ? AKTA_FEE : 0) + (includeNib ? NIB_FEE : 0);
                 const totalCharge = (count <= MAX_KBLI_FREE) ? 0 : (excessCount * perUnit);
 
-                $('#excess-kbli-count').text(`${excessCount} Kode`);
+                $('#excess-kbli-count').text(`${excessCount} KBLI`);
                 let breakdownParts = [];
                 if (count > MAX_KBLI_FREE) {
                     if (includeAkta) breakdownParts.push(`Akta: Rp${AKTA_FEE.toLocaleString('id-ID')}`);
