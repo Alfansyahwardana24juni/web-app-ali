@@ -1093,29 +1093,39 @@
                 <span class="text-sm font-bold text-amber-700">5 KBLI</span>
             </div>
 
-            <p class="text-sm text-gray-600 leading-relaxed mb-3">
-               <span class="text-amber-700 font-bold italic">*</span> dokumen <strong class="text-gray-800">Akta Notaris</strong> (Rp15.000) dan <strong class="text-gray-800">NIB</strong> (Rp100.000) bersifat <span class="text-amber-700 font-bold italic">wajib</span>.
-            </p>
-
-            <div id="kbli-doc-options" class="mt-4 p-4 bg-white rounded-lg border border-amber-100 hidden">
+            <div id="kbli-doc-options" class="hidden animate-fade-in-down">
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex gap-3 items-start">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-bold mb-1">Anda telah memilih lebih dari 5 KBLI.</p>
+                        <p class="leading-snug">
+                            Setiap kelebihan 1 KBLI akan dikenakan biaya:
+                            <ul class="list-disc list-inside mt-1 ml-1 text-blue-700">
+                                <li><strong>Rp15.000</strong> jika hanya Akta.</li>
+                                <li><strong>Rp115.000</strong> jika Akta + NIB (Rp15rb + Rp100rb).</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
                 <p class="text-sm font-semibold text-gray-700 mb-3 block">
-                    Pilihan untuk Kelebihan KBLI (>5):
+                    Pilih dokumen untuk kelebihan KBLI:
                 </p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label class="relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                        <input type="radio" name="kbli_doc_option_radio" value="akta" class="mt-1 h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                    <label class="relative flex items-center p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50/50">
+                        <input type="radio" name="kbli_doc_option_radio" value="akta" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
                         <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">Akta Saja</span>
-                            <span class="block text-xs text-gray-500 font-mono mt-1">Rp15.000</span>
+                            <span class="block text-sm font-bold text-gray-900">Akta Saja</span>
+                            <span class="block text-xs text-gray-500">Biaya: Rp15.000 / KBLI</span>
                         </div>
                     </label>
 
-                    <label class="relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                        <input type="radio" name="kbli_doc_option_radio" value="both" checked class="mt-1 h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                    <label class="relative flex items-center p-3 border rounded-lg cursor-pointer hover:bg-amber-50 transition-colors border-gray-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50/50">
+                        <input type="radio" name="kbli_doc_option_radio" value="both" checked class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
                         <div class="ml-3">
-                            <span class="block text-sm font-medium text-gray-900">Akta + NIB</span>
-                            <span class="block text-xs text-gray-500 font-mono mt-1">Rp15.000 + Rp100.000</span>
+                            <span class="block text-sm font-bold text-gray-900">Akta + NIB</span>
+                            <span class="block text-xs text-gray-500">Biaya: Rp115.000 / KBLI</span>
                         </div>
                     </label>
                 </div>
@@ -1125,15 +1135,15 @@
                 <input type="hidden" id="include_nib" name="include_nib" value="0">
             </div>
 
-            <div class="mt-4 pt-4 border-t border-amber-200/60 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
-                <div class="text-sm text-gray-600 space-y-1">
-                    <p>Kelebihan: <span id="excess-kbli-count" class="font-bold text-gray-800">0 KBLI</span></p>
-                    <p>Rincian: <span id="kbli-cost-breakdown" class="font-medium">-</span></p>
+            <div class="mt-4 pt-3 border-t border-amber-200/60 flex justify-between items-center">
+                <div class="text-sm text-gray-600">
+                    <p>Kelebihan: <span id="excess-kbli-count" class="font-bold text-gray-800">0 Kode</span></p>
+                    <p class="text-xs text-gray-500 mt-0.5">Rincian: <span id="kbli-cost-breakdown">-</span></p>
                 </div>
                 
-                <div class="text-right bg-white/50 px-3 py-2 rounded-lg">
-                    <p class="text-xs text-gray-500 uppercase font-bold">Total Biaya Tambahan</p>
-                    <p class="text-2xl font-extrabold text-amber-700" id="total-kbli-charge">Rp0</p>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Total Tambahan</p>
+                    <p class="text-xl font-extrabold text-amber-700" id="total-kbli-charge">Rp0</p>
                 </div>
             </div>
         </div>
