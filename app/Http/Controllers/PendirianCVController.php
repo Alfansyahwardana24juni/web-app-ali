@@ -243,14 +243,38 @@ class PendirianCVController extends Controller
     /**
      * Tampilkan halaman pengajuan sedang diproses
      */
-    public function processing()
+    public function processing(Request $request)
     {
-        // Ambil data pengajuan CV yang statusnya pending atau processing
-        $pendirianCVs = PendirianCV::whereIn('status', ['pending', 'processing'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $search = $request->input('search');
+        $status = $request->input('status');
 
-        return view('pendirian.cv.processing', compact('pendirianCVs'));
+        $query = PendirianCV::query();
+
+        // Default to showing only pending and processing if no specific status is selected
+        if ($status) {
+            $query->where('status', $status);
+        } else {
+            $query->whereIn('status', ['pending', 'processing']);
+        }
+
+        if ($search) {
+            $query->where('nama_perusahaan', 'LIKE', "%{$search}%");
+        }
+
+        $pendirianCVs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // Count total for display (not filtered by search, but filtered by the 'pending/processing' scope)
+        $totalPengajuan = PendirianCV::whereIn('status', ['pending', 'processing'])->count();
+
+        // If it's an AJAX request, return only the list part
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pendirian.cv.partials.list', compact('pendirianCVs'))->render(),
+                'total' => $totalPengajuan // Still return it, but JS will ignore it if we want it to stay fixed
+            ]);
+        }
+
+        return view('pendirian.cv.processing', compact('pendirianCVs', 'totalPengajuan'));
     }
 
     /**
