@@ -310,7 +310,7 @@
                             </div>
                             <a href="{{ asset('storage/' . $pendirian->payment_proof_path) }}" target="_blank"
                                 class="block w-full mt-3 text-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm text-sm font-medium">
-                                <i class="fas fa-download mr-2"></i> Download Bukti
+                                <i class="fas fa-download mr-2"></i> Lihat Bukti
                             </a>
                         @else
                             <div class="text-center py-6 bg-gray-50 rounded border border-dashed border-gray-300">
