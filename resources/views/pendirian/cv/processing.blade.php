@@ -71,7 +71,18 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b border-gray-200">
                                 <div>
                                     <p class="text-sm text-gray-600">Lokasi</p>
-                                    <p class="font-medium text-gray-900">{{ $pendirian->city }}, {{ $pendirian->province }}</p>
+                                    <p class="font-medium text-gray-900">
+                                        @php
+                                            try {
+                                                $cityName = \Laravolt\Indonesia\Facade::findCity($pendirian->city)->name ?? $pendirian->city;
+                                                $provinceName = \Laravolt\Indonesia\Facade::findProvince($pendirian->province)->name ?? $pendirian->province;
+                                            } catch (\Exception $e) {
+                                                $cityName = $pendirian->city;
+                                                $provinceName = $pendirian->province;
+                                            }
+                                        @endphp
+                                        {{ $cityName }}, {{ $provinceName }}
+                                    </p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Bank Rekanan</p>
