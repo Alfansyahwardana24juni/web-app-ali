@@ -144,7 +144,7 @@ class PendirianCVController extends Controller
             'komisaris.nama.*' => 'nullable|string',
             'komisaris.ktp.*' => 'required_with:komisaris.nama.*|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'komisaris.npwp.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'kbli_selected' => 'required|array',
+            'kbli_selected' => 'required|string', // Terima string JSON
             'selected_bank' => 'nullable|string',
             'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
@@ -192,7 +192,7 @@ class PendirianCVController extends Controller
         }
 
         // Simpan data ke database
-        PendirianCV::create([
+        $pendirianCV = PendirianCV::create([
             'nama_perusahaan' => $request->nama_perusahaan,
             'province' => $request->province,
             'city' => $request->city,
@@ -202,12 +202,29 @@ class PendirianCVController extends Controller
             'kode_pos' => $request->kode_pos,
             'direktur_data' => $direkturData, // Casted to array/json by model
             'komisaris_data' => $komisarisData, // Casted to array/json by model
-            'kbli_selected' => $request->kbli_selected, // Casted to array/json by model
+            'kbli_selected' => json_decode($request->kbli_selected, true), // Decode JSON string to array
             'selected_bank' => $request->selected_bank,
             'payment_proof_path' => $paymentProofPath,
             'status' => 'pending',
         ]);
 
-        return redirect()->route('pendirian.cv.form')->with('success', 'Data pendirian CV berhasil disimpan!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pendirian CV berhasil disimpan!',
+            'redirect' => route('pendirian.cv.processing')
+        ]);
+    }
+
+    /**
+     * Tampilkan halaman pengajuan sedang diproses
+     */
+    public function processing()
+    {
+        // Ambil data pengajuan CV yang statusnya pending atau processing
+        $pendirianCVs = PendirianCV::whereIn('status', ['pending', 'processing'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('pendirian.cv.processing', compact('pendirianCVs'));
     }
 }

@@ -958,7 +958,7 @@
                     <div class="sidebar-section-header sidebar-text">PENGAJUAN</div>
 
                     <div class="sidebar-item">
-                        <a href="#" class="sidebar-link">
+                        <a href="{{ route('pendirian.cv.processing') }}" class="sidebar-link">
                             <div class="sidebar-icon">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
