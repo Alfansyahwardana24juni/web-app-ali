@@ -893,8 +893,8 @@
             <div class="form-container">
                 <!-- Header -->
                 <div class="form-header">
-                    <h2>Form Pendirian CV</h2>
-                    <p>Lengkapi formulir berikut untuk mengajukan pendirian CV</p>
+                    <h2>{{ isset($pendirianCV) ? 'Edit Pengajuan CV' : 'Form Pendirian CV' }}</h2>
+                    <p>{{ isset($pendirianCV) ? 'Perbarui data pengajuan pendirian CV Anda' : 'Lengkapi formulir berikut untuk mengajukan pendirian CV' }}</p>
                 </div>
 
                 <!-- Body -->
@@ -1333,28 +1333,47 @@
                         <!-- Modal Sukses Pengajuan -->
                         <div id="submission-success-modal" style="display: none;"
                             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <!-- ... (existing content) ... -->
                             <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
-                                <!-- Icon Success -->
                                 <div class="text-center mb-6">
-                                    <div
-                                        class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
                                         <i class="fas fa-check text-3xl text-green-600"></i>
                                     </div>
                                 </div>
-
-                                <!-- Title -->
                                 <h2 class="text-2xl font-bold text-center text-gray-900 mb-2">Pengajuan Terkirim</h2>
-
-                                <!-- Message -->
                                 <p class="text-center text-gray-600 mb-6 leading-relaxed">
                                     Pengajuan anda sedang di proses. Silakan tunggu konfirmasi dari kami.
                                 </p>
-
-                                <!-- Button -->
-                                <button id="lanjut-btn"
+                                <button id="lanjut-btn" type="button"
                                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
                                     Lanjut
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Modal Konfirmasi Edit -->
+                        <div id="confirm-edit-modal" style="display: none;"
+                            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+                                <div class="text-center mb-6">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
+                                        <i class="fas fa-exclamation-triangle text-3xl text-yellow-600"></i>
+                                    </div>
+                                </div>
+                                <h2 class="text-2xl font-bold text-center text-gray-900 mb-2">Konfirmasi Perubahan</h2>
+                                <p class="text-center text-gray-600 mb-6 leading-relaxed">
+                                    Apakah Anda yakin ingin menyimpan perubahan pada data pengajuan <strong id="confirm-company-name"></strong> ini?
+                                </p>
+                                <div class="flex gap-4">
+                                    <button type="button" id="cancel-edit-btn"
+                                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                                        Batal
+                                    </button>
+                                    <button type="button" id="confirm-edit-submit-btn"
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                                        Ya, Simpan
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -1845,12 +1864,24 @@
 
                         // Step 5 adalah langkah pembayaran (langkah terakhir sebelum submit)
                         if (step === 5) {
-                            // Ubah tombol menjadi tombol submit
-                            nextBtn.html('<i class="fas fa-paper-plane mr-2"></i>Ajukan Pendirian').attr('type', 'submit').attr('form', 'pendirian-cv-form').off('click');
+                            // Ubah tombol menjadi tombol submit atau simpan
+                            const btnText = isEdit ? 'Simpan Perubahan' : 'Ajukan Pendirian';
+                            const btnIcon = isEdit ? 'fas fa-save' : 'fas fa-paper-plane';
+                            
+                            nextBtn.html(`<i class="${btnIcon} mr-2"></i>${btnText}`)
+                                .attr('type', 'button') // Tetap 'button' agar tidak trigger 'submit' otomatis
+                                .attr('form', 'pendirian-cv-form')
+                                .off('click')
+                                .on('click', function() {
+                                    // Trigger submit event secara manual agar divalidasi oleh handler form.submit
+                                    $('#pendirian-cv-form').trigger('submit');
+                                });
                         } else {
                             // Logika normal untuk step 1, 2, 3, 4
-                            nextBtn.html('Lanjutkan<i class="fas fa-arrow-right ml-2"></i>').attr('type', 'button').off(
-                                'click').on('click', handleNext);
+                            nextBtn.html('Lanjutkan<i class="fas fa-arrow-right ml-2"></i>')
+                                .attr('type', 'button')
+                                .off('click')
+                                .on('click', handleNext);
                         }
                     }
 
@@ -2725,6 +2756,45 @@
                     }
 
                     // --- FINAL FORM SUBMISSION ---
+                    function submitFormViaAjax() {
+                        const submitBtn = $('#next-step-btn');
+                        const originalText = submitBtn.html();
+                        submitBtn.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
+
+                        const form = document.getElementById('pendirian-cv-form');
+                        const formData = new FormData(form);
+                        
+                        $.ajax({
+                            url: $(form).attr('action'),
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                localStorage.removeItem('selectedKBLIs');
+                                // Tampilkan modal sukses
+                                $('#submission-success-modal').fadeIn(300);
+                                $('#confirm-edit-modal').fadeOut(300);
+
+                                // Set redirect URL di tombol "Lanjut"
+                                $('#lanjut-btn').data('redirect', response.redirect || '/dashboard');
+                            },
+                            error: function (xhr) {
+                                let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                    errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
+                                        '<br>');
+                                }
+                                showToast(errorMessage, 'error');
+                                submitBtn.prop('disabled', false).html(originalText);
+                                $('#confirm-edit-modal').fadeOut(300);
+                            }
+                        });
+                    }
+
                     $('#pendirian-cv-form').on('submit', function (e) {
                         e.preventDefault();
 
@@ -2742,38 +2812,21 @@
 
                         if (!allValid) return;
 
-                        const submitBtn = $('#next-step-btn'); // Tombol submit sekarang adalah tombol next
-                        const originalText = submitBtn.html();
-                        submitBtn.prop('disabled', true).html(
-                            '<span class="spinner-border spinner-border-sm mr-2"></span> Mengirim...');
+                        if (isEdit) {
+                            $('#confirm-company-name').text($('#nama_perusahaan').val());
+                            $('#confirm-edit-modal').fadeIn(300);
+                        } else {
+                            submitFormViaAjax();
+                        }
+                    });
 
-                        const formData = new FormData(this);
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                localStorage.removeItem('selectedKBLIs');
-                                // Tampilkan modal sukses
-                                $('#submission-success-modal').fadeIn(300);
+                    // Confirm and Cancel buttons for Edit Modal
+                    $('#confirm-edit-submit-btn').on('click', function() {
+                        submitFormViaAjax();
+                    });
 
-                                // Set redirect URL di tombol "Lanjut"
-                                $('#lanjut-btn').data('redirect', response.redirect || '/dashboard');
-                            },
-                            error: function (xhr) {
-                                let errorMessage = 'Terjadi kesalahan saat mengirim formulir.';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
-                                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                                    errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                        '<br>');
-                                }
-                                showToast(errorMessage, 'error');
-                                submitBtn.prop('disabled', false).html(originalText);
-                            }
-                        });
+                    $('#cancel-edit-btn').on('click', function() {
+                        $('#confirm-edit-modal').fadeOut(300);
                     });
 
                     // Handle tombol "Lanjut" di modal
