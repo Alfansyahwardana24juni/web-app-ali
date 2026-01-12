@@ -529,4 +529,19 @@ class PendirianCVController extends Controller
 
         return view('pendirian.cv.show', compact('pendirian', 'provinceName', 'cityName', 'districtName', 'villageName'));
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $pendirian = PendirianCV::findOrFail($id);
+
+        // Optional: Delete associated files if needed (KTP, NPWP, Payment Proof)
+        // Storage::disk('public')->delete($pendirian->payment_proof_path);
+
+        $pendirian->delete();
+
+        return redirect()->route('pendirian.cv.processing')->with('success', 'Data pendirian CV berhasil dihapus.');
+    }
 }
