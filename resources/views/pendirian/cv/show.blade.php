@@ -260,10 +260,26 @@
                         </h3>
                     </div>
                     <div class="p-6 text-center">
+                        @php
+                            $bankLogosMap = [
+                                'Mandiri' => 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Bank_Mandiri_logo.svg/222px-Bank_Mandiri_logo.svg.png?20161029145158',
+                                'BNI' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Wondr_by_BNI.svg/250px-Logo_Wondr_by_BNI.svg.png',
+                                'BRI' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png',
+                                'BSI' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png',
+                                'OCBC' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Logo-ocbc.svg/512px-Logo-ocbc.svg.png'
+                            ];
+                        @endphp
+
                         @if($pendirian->selected_bank)
-                            <div class="inline-block p-4 border rounded-xl mb-3 shadow-sm">
-                                <i class="fas fa-building text-4xl text-gray-400 mb-2 block"></i>
-                                <span class="font-bold text-xl text-gray-800">{{ $pendirian->selected_bank }}</span>
+                            <div class="inline-block p-6 border rounded-xl mb-3 shadow-sm bg-white hover:shadow-md transition-shadow">
+                                @if(array_key_exists($pendirian->selected_bank, $bankLogosMap))
+                                    <div class="h-16 flex items-center justify-center mb-3">
+                                        <img src="{{ $bankLogosMap[$pendirian->selected_bank] }}" alt="{{ $pendirian->selected_bank }}" class="max-h-full max-w-[150px] object-contain">
+                                    </div>
+                                @else
+                                    <i class="fas fa-building text-4xl text-gray-400 mb-2 block"></i>
+                                @endif
+                                <span class="font-bold text-xl text-gray-800 block">{{ $pendirian->selected_bank }}</span>
                             </div>
                             <p class="text-sm text-gray-500">Bank yang dipilih untuk pembukaan rekening perusahaan.</p>
                         @else
