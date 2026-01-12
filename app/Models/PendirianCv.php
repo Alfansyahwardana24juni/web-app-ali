@@ -32,6 +32,7 @@ class PendirianCV extends Model
         'direktur_data',
         'komisaris_data',
         'kbli_selected',
+        'kbli_doc_option',
         'selected_bank',
         'payment_proof_path',
         'status',

@@ -39,6 +39,9 @@ Route::prefix('pendirian')->group(function () {
     Route::get('/cv/form', [PendirianCVController::class, 'create'])->name('pendirian.cv.form');
     Route::post('/cv/form', [PendirianCVController::class, 'store'])->name('pendirian.cv.store');
     Route::get('/cv/processing', [PendirianCVController::class, 'processing'])->name('pendirian.cv.processing');
+    Route::get('/cv/{id}/edit', [PendirianCVController::class, 'edit'])->name('pendirian.cv.edit');
+    Route::put('/cv/{id}', [PendirianCVController::class, 'update'])->name('pendirian.cv.update');
+    Route::get('/cv/{id}', [PendirianCVController::class, 'show'])->name('pendirian.cv.show');
 
     Route::get('/pt', [PendirianPTController::class, 'index'])->name('pendirian.pt.index');
     Route::get('/pt/form', [PendirianPTController::class, 'create'])->name('pendirian.pt.form');
