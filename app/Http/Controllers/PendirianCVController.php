@@ -551,7 +551,41 @@ class PendirianCVController extends Controller
             $villageName = $pendirian->village;
         } // villages might be integers or strings depending on version
 
-        return view('pendirian.cv.show', compact('pendirian', 'provinceName', 'cityName', 'districtName', 'villageName'));
+        // Determine timezone based on province (default to WIB - Asia/Jakarta)
+        $province = $provinceName ?? $pendirian->province ?? '';
+        $province = is_string($province) ? trim($province) : '' ;
+
+        $witaProvinces = [
+            'Bali', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur',
+            'Kalimantan Selatan', 'Kalimantan Timur', 'Kalimantan Utara',
+            'Sulawesi Utara', 'Sulawesi Tengah', 'Sulawesi Selatan',
+            'Sulawesi Tenggara', 'Gorontalo', 'Sulawesi Barat'
+        ];
+
+        $witProvinces = [
+            'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat'
+        ];
+
+        $tzLabel = 'WIB';
+        $tz = 'Asia/Jakarta';
+
+        if (in_array($province, $witProvinces)) {
+            $tz = 'Asia/Jayapura';
+            $tzLabel = 'WIT';
+        } elseif (in_array($province, $witaProvinces)) {
+            $tz = 'Asia/Makassar';
+            $tzLabel = 'WITA';
+        }
+
+        // Localize created_at to target timezone
+        try {
+            $submissionTime = $pendirian->created_at->timezone($tz)->isoFormat('D MMMM Y, HH:mm');
+        } catch (\Exception $e) {
+            // Fallback to original format if anything goes wrong
+            $submissionTime = $pendirian->created_at->isoFormat('D MMMM Y, HH:mm');
+        }
+
+        return view('pendirian.cv.show', compact('pendirian', 'provinceName', 'cityName', 'districtName', 'villageName', 'submissionTime', 'tzLabel'));
     }
 
     /**

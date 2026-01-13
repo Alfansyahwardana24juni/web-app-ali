@@ -24,7 +24,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">{{ $pendirian->nama_perusahaan }}</h1>
                     <p class="text-gray-500 mt-1">
                         <i class="far fa-calendar-alt mr-2"></i>
-                        Diajukan pada {{ $pendirian->created_at->isoFormat('D MMMM Y, HH:mm') }} WIB
+                        Diajukan pada {{ $submissionTime ?? $pendirian->created_at->isoFormat('D MMMM Y, HH:mm') }} {{ $tzLabel ?? 'WIB' }}
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
