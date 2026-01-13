@@ -1854,6 +1854,25 @@
                         if (step === 5) {
                             updateSubmissionSummary();
                             updatePaymentSummary();
+
+                            // Scroll to top of the payment section so the user sees it immediately
+                            try {
+                                const $target = $(`.form-section[data-step="5"]`);
+                                if ($target.length) {
+                                    const offsetTop = Math.max(0, $target.offset().top - 100);
+                                    $('html, body').animate({ scrollTop: offsetTop }, 450, function() {
+                                        // Focus first actionable element in payment section (upload input or button)
+                                        try {
+                                            const $focusEl = $target.find('#payment_proof, #upload-payment-proof-btn, input, button').filter(':visible').first();
+                                            if ($focusEl.length) $focusEl.focus();
+                                        } catch (err) {
+                                            // ignore focus errors
+                                        }
+                                    });
+                                }
+                            } catch (e) {
+                                // ignore scrolling errors
+                            }
                         }
                         if (step === 4) updateBankOptions();
                     }
