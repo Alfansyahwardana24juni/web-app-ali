@@ -1,6 +1,49 @@
 @if($pendirianCVs->count() > 0)
     <div class="space-y-4">
         @foreach($pendirianCVs as $pendirian)
+            @php
+                try {
+                    $cityName = \Laravolt\Indonesia\Facade::findCity($pendirian->city)->name ?? $pendirian->city;
+                    $provinceName = \Laravolt\Indonesia\Facade::findProvince($pendirian->province)->name ?? $pendirian->province;
+                } catch (\Exception $e) {
+                    $cityName = $pendirian->city;
+                    $provinceName = $pendirian->province;
+                }
+
+                $witaProvinces = [
+                    'Bali', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur',
+                    'Kalimantan Selatan', 'Kalimantan Timur', 'Kalimantan Utara',
+                    'Sulawesi Utara', 'Sulawesi Tengah', 'Sulawesi Selatan',
+                    'Sulawesi Tenggara', 'Gorontalo', 'Sulawesi Barat'
+                ];
+
+                $witProvinces = [
+                    'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat'
+                ];
+
+                $tzLabel = 'WIB';
+                $tz = 'Asia/Jakarta';
+
+                if (in_array($provinceName, $witProvinces)) {
+                    $tz = 'Asia/Jayapura';
+                    $tzLabel = 'WIT';
+                } elseif (in_array($provinceName, $witaProvinces)) {
+                    $tz = 'Asia/Makassar';
+                    $tzLabel = 'WITA';
+                }
+
+                try {
+                    $createdAtLocal = $pendirian->created_at->timezone($tz)->format('d M Y H:i');
+                } catch (\Exception $e) {
+                    $createdAtLocal = $pendirian->created_at->format('d M Y H:i');
+                }
+
+                try {
+                    $updatedAtLocal = $pendirian->updated_at->timezone($tz)->format('d M Y H:i');
+                } catch (\Exception $e) {
+                    $updatedAtLocal = $pendirian->updated_at->format('d M Y H:i');
+                }
+            @endphp
             <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div class="p-6">
                     <!-- Header Kartu -->
@@ -26,7 +69,7 @@
                                 {{ ucfirst(str_replace('_', ' ', $pendirian->status)) }}
                             </span>
                             <p class="text-xs text-gray-500">
-                                {{ $pendirian->created_at->format('d M Y H:i') }}
+                                {{ $createdAtLocal ?? $pendirian->created_at->format('d M Y H:i') }} {{ $tzLabel ?? 'WIB' }}
                             </p>
                         </div>
                     </div>
@@ -107,7 +150,7 @@
                                         {{ basename($pendirian->payment_proof_path) }}
                                     </p>
                                     <p class="text-xs text-gray-500">
-                                        {{ $pendirian->updated_at->format('d M Y H:i') }}
+                                        {{ $updatedAtLocal ?? $pendirian->updated_at->format('d M Y H:i') }} {{ $tzLabel ?? 'WIB' }}
                                     </p>
                                 </div>
                                 <a href="{{ asset('storage/' . $pendirian->payment_proof_path) }}" target="_blank"
