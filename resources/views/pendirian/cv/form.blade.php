@@ -1289,7 +1289,7 @@
                                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-2">Klik untuk upload atau seret file ke sini</p>
-                                    <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 5MB)</p>
+                                    <p class="text-xs text-gray-500">Format: JPG, PNG, PDF (Maks. 2MB)</p>
                                     <input type="file" id="payment_proof" name="payment_proof" class="hidden"
                                         accept="image/*,.pdf">
                                     <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn">
@@ -1668,11 +1668,15 @@
                         input.on('change', function () {
                             const file = this.files[0];
                             if (file) {
-                                // Validate file size (5MB max)
-                                if (file.size > 5 * 1024 * 1024) {
-                                    $('#payment_proof-error').text('Ukuran file terlalu besar. Maksimal 5MB.')
-                                        .show();
+                                // Validate file size (2MB max)
+                                if (file.size > 2 * 1024 * 1024) {
+                                    $('#payment_proof-error').text('Ukuran file terlalu besar. Maksimal 2MB.').show();
                                     input.val('');
+                                    // Clear preview UI
+                                    nameEl.text('');
+                                    $('#payment-proof-size').text('');
+                                    preview.addClass('hidden');
+                                    container.removeClass('has-file');
                                     return;
                                 }
 
@@ -1682,6 +1686,10 @@
                                     $('#payment_proof-error').text(
                                         'Format file tidak didukung. Gunakan JPG, PNG, atau PDF.').show();
                                     input.val('');
+                                    nameEl.text('');
+                                    $('#payment-proof-size').text('');
+                                    preview.addClass('hidden');
+                                    container.removeClass('has-file');
                                     return;
                                 }
 
@@ -1690,7 +1698,7 @@
                                 sizeEl.text(formatFileSize(file.size));
                                 preview.removeClass('hidden');
                                 container.addClass('has-file');
-                                $('#payment_proof-error').hide();
+                                $('#payment_proof-error').hide().text('');
                             }
                         });
 
@@ -1701,6 +1709,10 @@
                             input.val('');
                             preview.addClass('hidden');
                             container.removeClass('has-file');
+                            // Clear messages and labels
+                            $('#payment_proof-error').hide().text('');
+                            nameEl.text('');
+                            $('#payment-proof-size').text('');
                             return false;
                         });
 
@@ -2138,6 +2150,7 @@
                                             <img src="" alt="NPWP Preview" class="preview-image hidden">
                                             <button type="button" class="preview-remove hidden"><i class="fas fa-times"></i></button>
                                         </div>
+                                        <div class="error-message" id="${type}_${index}_npwp-error"></div>
                                     </div>
                                 </div>
                             </div>
@@ -2183,11 +2196,43 @@
 
                         $(document).on('change', 'input[type="file"]', function () {
                             const file = this.files[0];
-                            const previewContainer = $(this).siblings('.preview-container');
+                            const $input = $(this);
+                            const previewContainer = $input.siblings('.preview-container');
                             const previewImage = previewContainer.find('.preview-image');
                             const removeBtn = previewContainer.find('.preview-remove');
+                            const errorEl = $input.closest('.mb-4').find('.error-message').first();
 
-                            if (file && file.type.startsWith('image/')) {
+                            // Reset previous error
+                            errorEl.hide().text('');
+
+                            if (!file) {
+                                previewImage.addClass('hidden');
+                                removeBtn.addClass('hidden');
+                                return;
+                            }
+
+                            // Validate file size (2MB max)
+                            const maxSize = 2 * 1024 * 1024;
+                            if (file.size > maxSize) {
+                                errorEl.text('Ukuran file terlalu besar. Maksimal 2MB.').show();
+                                $input.val('');
+                                previewImage.addClass('hidden');
+                                removeBtn.addClass('hidden');
+                                return;
+                            }
+
+                            // Validate file type
+                            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                            if (!allowedTypes.includes(file.type)) {
+                                errorEl.text('Format file tidak didukung. Gunakan JPG, PNG, atau PDF.').show();
+                                $input.val('');
+                                previewImage.addClass('hidden');
+                                removeBtn.addClass('hidden');
+                                return;
+                            }
+
+                            // Display preview if image
+                            if (file.type.startsWith('image/')) {
                                 const reader = new FileReader();
                                 reader.onload = function (e) {
                                     previewImage.attr('src', e.target.result).removeClass('hidden');
@@ -2205,6 +2250,8 @@
                             const input = container.siblings('input[type="file"]');
                             input.val('');
                             container.find('.preview-image, .preview-remove').addClass('hidden');
+                            // Clear related error message
+                            input.closest('.mb-4').find('.error-message').hide().text('');
                         });
                     }
 
