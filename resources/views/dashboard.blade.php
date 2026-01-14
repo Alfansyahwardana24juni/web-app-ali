@@ -34,20 +34,7 @@
 }
 </style>
 
-<!-- SocialChat - Loaded asynchronously -->
-<script>
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        var js = document.createElement("script");
-        js.async = true;
-        window.WEBCHAT_URL =
-            'https://app.socialchat.id/webchat/f1d99d96d567ef7e07a1e8a182f7ffe44c?iframe=true';
-        window.WEBCHAT_BASE_URL = 'https://app.socialchat.id';
-        js.src = 'https://app.socialchat.id/widget/loader.js';
-        document.head.appendChild(js);
-    }, 2000);
-});
-</script>
+
 
 <!-- Welcome Banner -->
 <div
