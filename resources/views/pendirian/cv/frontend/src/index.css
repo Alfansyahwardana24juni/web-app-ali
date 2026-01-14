@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+@layer base {
+    :root {
+        /* Professional Navy/Gray Color System */
+        --background: 0 0% 98%;
+        --foreground: 215 25% 15%;
+        
+        /* Primary - Navy Blue (Trustworthy) */
+        --primary: 217 91% 25%;
+        --primary-foreground: 0 0% 100%;
+        --primary-hover: 217 91% 20%;
+        
+        /* Secondary - Steel Gray */
+        --secondary: 215 20% 45%;
+        --secondary-foreground: 0 0% 100%;
+        
+        /* Accent - Bright Blue (CTAs) */
+        --accent: 212 100% 48%;
+        --accent-foreground: 0 0% 100%;
+        --accent-hover: 212 100% 42%;
+        
+        /* Success - Professional Green */
+        --success: 145 63% 42%;
+        --success-foreground: 0 0% 100%;
+        --success-light: 145 63% 95%;
+        
+        /* Card/Surface */
+        --card: 0 0% 100%;
+        --card-foreground: 215 25% 15%;
+        
+        /* Muted - Light Gray */
+        --muted: 215 15% 92%;
+        --muted-foreground: 215 15% 45%;
+        
+        /* Border */
+        --border: 215 15% 88%;
+        --input: 215 15% 88%;
+        --ring: 217 91% 25%;
+        
+        /* Destructive */
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        
+        /* Popover */
+        --popover: 0 0% 100%;
+        --popover-foreground: 215 25% 15%;
+        
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-elegant: 0 4px 20px -4px hsl(217 91% 25% / 0.15);
+        
+        /* Border Radius */
+        --radius: 0.75rem;
+        --radius-sm: 0.5rem;
+        --radius-lg: 1rem;
+        
+        /* Transitions */
+        --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Spacing for touch targets */
+        --touch-target: 44px;
+    }
+    
+    .dark {
+        --background: 215 25% 10%;
+        --foreground: 0 0% 95%;
+        --primary: 217 91% 60%;
+        --primary-foreground: 215 25% 10%;
+        --card: 215 25% 12%;
+        --card-foreground: 0 0% 95%;
+        --muted: 215 15% 18%;
+        --muted-foreground: 215 15% 60%;
+        --border: 215 15% 22%;
+        --input: 215 15% 22%;
+        --ring: 217 91% 60%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        @apply bg-muted;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        @apply bg-muted-foreground rounded-full;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-primary;
+    }
+}
+
+@layer components {
+    /* Touch-friendly input styling */
+    .input-touch {
+        @apply min-h-[44px] text-base;
+    }
+    
+    /* Button touch target */
+    .btn-touch {
+        @apply min-h-[44px] min-w-[44px];
+    }
+    
+    /* Form section spacing */
+    .form-section {
+        @apply space-y-6 mb-8;
+    }
+    
+    /* Card elevation */
+    .card-elevated {
+        box-shadow: var(--shadow-elegant);
+    }
+    
+    /* Smooth transitions for interactive elements */
+    .transition-smooth {
+        transition: all var(--transition-smooth);
+    }
+    
+    /* Auto-save indicator pulse */
+    @keyframes pulse-subtle {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+    }
+    
+    .animate-pulse-subtle {
+        animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    /* Progress bar animation */
+    @keyframes progress-fill {
+        from {
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+        to {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+    }
+    
+    .animate-progress {
+        animation: progress-fill 0.5s ease-out;
+    }
+    
+    /* Slide in animation for cards */
+    @keyframes slide-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slide-in {
+        animation: slide-in 0.3s ease-out;
+    }
+}
+
+@layer utilities {
+    /* Text utilities */
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+        border-left-width: inherit;
+        border-right-width: inherit;
+        border-top-width: inherit;
+        border-bottom-width: inherit;
+        border-left-style: inherit;
+        border-right-style: inherit;
+        border-top-style: inherit;
+        border-bottom-style: inherit;
+        border-left-color: inherit;
+        border-right-color: inherit;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+    }
+}
