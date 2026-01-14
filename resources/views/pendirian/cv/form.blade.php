@@ -91,7 +91,7 @@
                         <div class="step-item active" data-step="1"><div class="step-circle"><i class="fas fa-building"></i></div><span class="step-label">Perusahaan</span></div>
                         <div class="step-item" data-step="2"><div class="step-circle"><i class="fas fa-users"></i></div><span class="step-label">Direktur</span></div>
                         <div class="step-item" data-step="3"><div class="step-circle"><i class="fas fa-user-tie"></i></div><span class="step-label">Komisaris</span></div>
-                        <div class="step-item" data-step="4"><div class="step-circle"><i class="fas fa-landmark"></i></div><span class="step-label">KBLI</span></div>
+                        <div class="step-item" data-step="4"><div class="step-circle"><i class="fas fa-landmark"></i></div><span class="step-label">KBLI & Bank</span></div>
                         <div class="step-item" data-step="5"><div class="step-circle"><i class="fas fa-credit-card"></i></div><span class="step-label">Bayar</span></div>
                     </div>
                 </div>
@@ -481,11 +481,25 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4"><label class="form-label required">Nama Lengkap</label><input type="text" name="${type}[${index}][nama]" class="form-input" required value="${data?data.nama:''}"></div>
                             <div class="mb-4"><label class="form-label required">Upload KTP</label><input type="file" name="${type}[${index}][ktp]" class="form-input" accept="image/*,.pdf"></div>
+                            <div class="mb-4"><label class="form-label">Upload NPWP (Opsional)</label><input type="file" name="${type}[${index}][npwp]" class="form-input" accept="image/*,.pdf"></div>
                         </div></div>`;
              }
              function initializePersonForms() {
-                 if($('#direktur-container').children().length === 0) $('#add-direktur').click();
-                 if($('#komisaris-container').children().length === 0) $('#add-komisaris').click();
+                 if(isEdit && editData) {
+                     if(editData.direktur && editData.direktur.length > 0) {
+                         editData.direktur.forEach((d, i) => $('#direktur-container').append(createPersonTemplate('direktur', i, d)));
+                     } else {
+                         $('#add-direktur').click();
+                     }
+                     if(editData.komisaris && editData.komisaris.length > 0) {
+                         editData.komisaris.forEach((k, i) => $('#komisaris-container').append(createPersonTemplate('komisaris', i, k)));
+                     } else {
+                         $('#add-komisaris').click();
+                     }
+                 } else {
+                     if($('#direktur-container').children().length === 0) $('#add-direktur').click();
+                     if($('#komisaris-container').children().length === 0) $('#add-komisaris').click();
+                 }
              }
              $('#add-direktur').click(()=> $('#direktur-container').append(createPersonTemplate('direktur', $('#direktur-container .person-entry').length)));
              $('#add-komisaris').click(()=> $('#komisaris-container').append(createPersonTemplate('komisaris', $('#komisaris-container .person-entry').length)));
