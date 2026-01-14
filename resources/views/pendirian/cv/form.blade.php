@@ -508,6 +508,12 @@
             }
             function updateNavigationButtons(step) {
                 const next = $('#next-step-btn');
+                // Hide Prev button on step 1, show on subsequent steps
+                if (step === 1) {
+                    $('#prev-step-btn').hide();
+                } else {
+                    $('#prev-step-btn').show();
+                }
                 $('#prev-step-btn').prop('disabled', step===1);
                 if(step === 5) {
                     next.html(`<i class="fas fa-paper-plane mr-2"></i> ${isEdit?'Simpan Perubahan':'Ajukan Pendirian'}`).removeClass('btn-primary').addClass('bg-green-600 hover:bg-green-700 text-white').off('click').on('click', ()=> $('#pendirian-cv-form').submit());
