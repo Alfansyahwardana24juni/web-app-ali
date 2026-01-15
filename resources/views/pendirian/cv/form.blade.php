@@ -413,6 +413,7 @@
                         <div class="form-group mb-4">
                             <label for="nama_perusahaan" class="form-label required">Nama Perusahaan</label>
                             <input type="text" class="form-input" id="nama_perusahaan" name="nama_perusahaan" required
+                                placeholder="Contoh: Maju Jaya Abadi"
                                 value="{{ old('nama_perusahaan', $pendirianCV->nama_perusahaan ?? '') }}">
                             <p class="text-xs text-muted-foreground mt-1">Minimal 2 suku kata.</p>
                             <div class="error-message text-red-500 text-xs mt-1" id="nama_perusahaan-error"></div>
@@ -460,6 +461,7 @@
                             <div class="form-group mt-4">
                                 <label for="kode_pos" class="form-label required">Kode Pos</label>
                                 <input type="text" class="form-input" id="kode_pos" name="kode_pos" required
+                                    placeholder="Contoh: 12345"
                                     value="{{ old('kode_pos', $pendirianCV->kode_pos ?? '') }}">
                                 <div class="error-message text-red-500 text-xs mt-1" id="kode_pos-error"></div>
                             </div>
@@ -645,8 +647,9 @@
                                 id="payment-proof-container">
                                 <div class="mb-4"><i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i></div>
                                 <p class="text-sm text-gray-600 mb-2">Klik atau seret file ke sini</p>
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, PNG, PDF. Maks: 2MB.</p>
                                 <input type="file" id="payment_proof" name="payment_proof" class="hidden"
-                                    accept="image/*,.pdf">
+                                    accept=".jpg,.jpeg,.png,.pdf">
                                 <button type="button" class="btn btn-primary mt-2" id="upload-payment-proof-btn"><i
                                         class="fas fa-upload mr-2"></i> Pilih File</button>
                             </div>
@@ -921,8 +924,8 @@
                         <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200"><h4 class="font-bold text-gray-700">${type.charAt(0).toUpperCase() + type.slice(1)} #${index + 1}</h4>${index > 0 ? '<button type="button" class="remove-person text-red-500"><i class="fas fa-trash"></i></button>' : ''}</div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4"><label class="form-label required">Nama Lengkap</label><input type="text" name="${type}[${index}][nama]" class="form-input" required value="${data ? data.nama : ''}"></div>
-                            <div class="mb-4"><label class="form-label required">Upload KTP</label><input type="file" name="${type}[${index}][ktp]" class="form-input file-input-preview" accept="image/*,.pdf"><div class="file-preview mt-2 hidden"></div></div>
-                            <div class="mb-4"><label class="form-label">Upload NPWP (Opsional)</label><input type="file" name="${type}[${index}][npwp]" class="form-input file-input-preview" accept="image/*,.pdf"><div class="file-preview mt-2 hidden"></div></div>
+                            <div class="mb-4"><label class="form-label required">Upload KTP</label><input type="file" name="${type}[${index}][ktp]" class="form-input file-input-preview" accept=".jpg,.jpeg,.png,.pdf"><p class="text-xs text-muted-foreground mt-1">Format: JPG, PNG, PDF. Maks: 2MB.</p><div class="file-preview mt-2 hidden"></div></div>
+                            <div class="mb-4"><label class="form-label">Upload NPWP (Opsional)</label><input type="file" name="${type}[${index}][npwp]" class="form-input file-input-preview" accept=".jpg,.jpeg,.png,.pdf"><p class="text-xs text-muted-foreground mt-1">Format: JPG, PNG, PDF. Maks: 2MB.</p><div class="file-preview mt-2 hidden"></div></div>
                         </div></div>`;
             }
             function initializePersonForms() {
@@ -946,38 +949,80 @@
             $('#add-komisaris').click(() => $('#komisaris-container').append(createPersonTemplate('komisaris', $('#komisaris-container .person-entry').length)));
             $(document).on('click', '.remove-person', function () { $(this).closest('.person-entry').remove(); });
 
+            // Payment Proof Button Handler
+            $('#upload-payment-proof-btn').click(function () { $('#payment_proof').click(); });
+
             // File Preview Handler
-            $(document).on('change', '.file-input-preview', function (event) {
+            $(document).on('change', '.file-input-preview, #payment_proof', function (event) {
                 const file = event.target.files[0];
-                const previewContainer = $(this).next('.file-preview');
+                const isPaymentProof = $(this).attr('id') === 'payment_proof';
+                const previewContainer = isPaymentProof ? $('#payment-proof-preview') : $(this).next('.file-preview');
 
                 if (file) {
-                    if (file.type.match('image.*')) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span></div>`).removeClass('hidden');
+                    // Validation
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Format file tidak didukung. Harap upload JPG, PNG, atau PDF.');
+                        $(this).val('');
+                        if (!isPaymentProof) {
+                            previewContainer.empty().addClass('hidden');
+                        } else {
+                            previewContainer.addClass('hidden');
                         }
-                        reader.readAsDataURL(file);
-                    } else {
-                        // Handle non-image files (e.g. PDF)
-                        let iconClass = 'fa-file-alt text-gray-500';
-                        if (file.type === 'application/pdf') {
-                            iconClass = 'fa-file-pdf text-red-500';
+                        return;
+                    }
+                    if (file.size > 2 * 1024 * 1024) { // 2MB
+                        alert('Ukuran file terlalu besar. Maksimal 2MB.');
+                        $(this).val('');
+                        if (!isPaymentProof) {
+                            previewContainer.empty().addClass('hidden');
+                        } else {
+                            previewContainer.addClass('hidden');
                         }
+                        return;
+                    }
 
-                        previewContainer.html(`
-                            <div class="relative inline-flex items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm mt-2">
-                                <i class="fas ${iconClass} text-2xl mr-3"></i>
-                                <div class="mr-4">
-                                    <p class="text-sm font-medium text-gray-800 break-all line-clamp-1 max-w-[200px]">${file.name}</p>
-                                    <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(0)} KB</p>
+                    // Render Preview
+                    if (isPaymentProof) {
+                        // Payment Proof Specific UI
+                        $('#payment-proof-name').text(file.name);
+                        $('#payment-proof-size').text((file.size / 1024).toFixed(0) + ' KB');
+                        previewContainer.removeClass('hidden');
+
+                        // Add click handler for removal (since it's a specific button in the static HTML)
+                        $('#remove-payment-proof').off('click').on('click', function () {
+                            $('#payment_proof').val('');
+                            $('#payment-proof-preview').addClass('hidden');
+                        });
+                    } else {
+                        if (file.type.match('image.*')) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span></div>`).removeClass('hidden');
+                            }
+                            reader.readAsDataURL(file);
+                        } else {
+                            // Handle non-image files (e.g. PDF)
+                            let iconClass = 'fa-file-alt text-gray-500';
+                            if (file.type === 'application/pdf') {
+                                iconClass = 'fa-file-pdf text-red-500';
+                            }
+
+                            previewContainer.html(`
+                                <div class="relative inline-flex items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm mt-2">
+                                    <i class="fas ${iconClass} text-2xl mr-3"></i>
+                                    <div class="mr-4">
+                                        <p class="text-sm font-medium text-gray-800 break-all line-clamp-1 max-w-[200px]">${file.name}</p>
+                                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(0)} KB</p>
+                                    </div>
+                                    <span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span>
                                 </div>
-                                <span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span>
-                            </div>
-                        `).removeClass('hidden');
+                            `).removeClass('hidden');
+                        }
                     }
                 } else {
-                    previewContainer.empty().addClass('hidden');
+                    if (!isPaymentProof) previewContainer.empty().addClass('hidden');
+                    else previewContainer.addClass('hidden');
                 }
             });
 
