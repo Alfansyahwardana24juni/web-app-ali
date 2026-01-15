@@ -394,7 +394,8 @@
         <main class="main-content max-w-2xl mx-auto px-4 py-6 mb-24">
             @if(session('success'))
                 <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 text-green-700">
-                    <i class="fas fa-check-circle text-xl"></i><span>{{ session('success') }}</span></div>
+                    <i class="fas fa-check-circle text-xl"></i><span>{{ session('success') }}</span>
+                </div>
             @endif
 
             <div class="card-elevated bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
@@ -950,12 +951,31 @@
                 const file = event.target.files[0];
                 const previewContainer = $(this).next('.file-preview');
 
-                if (file && file.type.match('image.*')) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span></div>`).removeClass('hidden');
+                if (file) {
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span></div>`).removeClass('hidden');
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Handle non-image files (e.g. PDF)
+                        let iconClass = 'fa-file-alt text-gray-500';
+                        if (file.type === 'application/pdf') {
+                            iconClass = 'fa-file-pdf text-red-500';
+                        }
+
+                        previewContainer.html(`
+                            <div class="relative inline-flex items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm mt-2">
+                                <i class="fas ${iconClass} text-2xl mr-3"></i>
+                                <div class="mr-4">
+                                    <p class="text-sm font-medium text-gray-800 break-all line-clamp-1 max-w-[200px]">${file.name}</p>
+                                    <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(0)} KB</p>
+                                </div>
+                                <span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span>
+                            </div>
+                        `).removeClass('hidden');
                     }
-                    reader.readAsDataURL(file);
                 } else {
                     previewContainer.empty().addClass('hidden');
                 }
