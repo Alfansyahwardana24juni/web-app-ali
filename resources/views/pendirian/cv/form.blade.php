@@ -298,6 +298,11 @@
             width: 100% !important;
         }
 
+        .form-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -921,8 +926,8 @@
                 return `<div class="person-entry relative" data-type="${type}" data-index="${index}">
                         <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200"><h4 class="font-bold text-gray-700">${type.charAt(0).toUpperCase() + type.slice(1)} #${index + 1}</h4>${index > 0 ? '<button type="button" class="remove-person text-red-500"><i class="fas fa-trash"></i></button>' : ''}</div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="mb-4"><label class="form-label required">Nama Lengkap</label><input type="text" name="${type}[${index}][nama]" class="form-input" required value="${data ? data.nama : ''}"></div>
-                            <div class="mb-4"><label class="form-label required">Upload KTP</label><input type="file" name="${type}[${index}][ktp]" class="form-input file-input-preview" accept=".jpg,.jpeg,.png,.pdf"><p class="text-xs text-muted-foreground mt-1">Format: JPG, PNG, PDF. Maks: 2MB.</p><div class="file-preview mt-2 hidden"></div></div>
+                            <div class="mb-4"><label class="form-label required">Nama Lengkap</label><input type="text" name="${type}[${index}][nama]" class="form-input" required value="${data ? data.nama : ''}"><div class="error-message text-red-500 text-xs mt-1"></div></div>
+                            <div class="mb-4"><label class="form-label required">Upload KTP</label><input type="file" name="${type}[${index}][ktp]" class="form-input file-input-preview" accept=".jpg,.jpeg,.png,.pdf"><p class="text-xs text-muted-foreground mt-1">Format: JPG, PNG, PDF. Maks: 2MB.</p><div class="file-preview mt-2 hidden"></div><div class="error-message text-red-500 text-xs mt-1"></div></div>
                             <div class="mb-4"><label class="form-label">Upload NPWP (Opsional)</label><input type="file" name="${type}[${index}][npwp]" class="form-input file-input-preview" accept=".jpg,.jpeg,.png,.pdf"><p class="text-xs text-muted-foreground mt-1">Format: JPG, PNG, PDF. Maks: 2MB.</p><div class="file-preview mt-2 hidden"></div></div>
                         </div></div>`;
             }
@@ -1070,7 +1075,7 @@
             function validateStep(step) {
                 let valid = true;
                 $('.error-message').text(''); // Clear previous errors
-                $('.form-input, .person-entry input').removeClass('shake'); // Remove previous shakes
+                $('.form-input, .person-entry input, select').removeClass('shake error'); // Remove previous shakes and errors
 
                 let firstErrorField = null;
 
@@ -1078,43 +1083,43 @@
                     // Step 1: Informasi Perusahaan
                     if (!$('#nama_perusahaan').val().trim()) {
                         $('#nama_perusahaan-error').text('Nama perusahaan wajib diisi');
-                        $('#nama_perusahaan').addClass('shake');
+                        $('#nama_perusahaan').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#nama_perusahaan';
                         valid = false;
                     }
                     if (!$('#province').val()) {
                         $('#province-error').text('Provinsi wajib dipilih');
-                        $('#province').addClass('shake');
+                        $('#province').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#province';
                         valid = false;
                     }
                     if (!$('#city').val()) {
                         $('#city-error').text('Kota/Kabupaten wajib dipilih');
-                        $('#city').addClass('shake');
+                        $('#city').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#city';
                         valid = false;
                     }
                     if (!$('#district').val()) {
                         $('#district-error').text('Kecamatan wajib dipilih');
-                        $('#district').addClass('shake');
+                        $('#district').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#district';
                         valid = false;
                     }
                     if (!$('#village').val()) {
                         $('#village-error').text('Desa/Kelurahan wajib dipilih');
-                        $('#village').addClass('shake');
+                        $('#village').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#village';
                         valid = false;
                     }
                     if (!$('#alamat_lengkap').val().trim()) {
                         $('#alamat_lengkap-error').text('Alamat lengkap wajib diisi');
-                        $('#alamat_lengkap').addClass('shake');
+                        $('#alamat_lengkap').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#alamat_lengkap';
                         valid = false;
                     }
                     if (!$('#kode_pos').val().trim()) {
                         $('#kode_pos-error').text('Kode pos wajib diisi');
-                        $('#kode_pos').addClass('shake');
+                        $('#kode_pos').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#kode_pos';
                         valid = false;
                     }
@@ -1130,13 +1135,17 @@
                             const entry = $(this);
                             const namaInput = entry.find('input[name="direktur[' + index + '][nama]"]');
                             const ktpInput = entry.find('input[name="direktur[' + index + '][ktp]"]');
+                            const namaError = namaInput.parent().find('.error-message').first();
+                            const ktpError = ktpInput.parent().find('.error-message').last();
                             if (!namaInput.val().trim()) {
-                                namaInput.addClass('shake');
+                                namaError.text('Nama direktur wajib diisi');
+                                namaInput.addClass('shake error');
                                 if (!firstErrorField) firstErrorField = namaInput;
                                 valid = false;
                             }
                             if (!ktpInput.val()) {
-                                ktpInput.addClass('shake');
+                                ktpError.text('KTP direktur wajib diupload');
+                                ktpInput.addClass('shake error');
                                 if (!firstErrorField) firstErrorField = ktpInput;
                                 valid = false;
                             }
@@ -1154,13 +1163,17 @@
                             const entry = $(this);
                             const namaInput = entry.find('input[name="komisaris[' + index + '][nama]"]');
                             const ktpInput = entry.find('input[name="komisaris[' + index + '][ktp]"]');
+                            const namaError = namaInput.parent().find('.error-message').first();
+                            const ktpError = ktpInput.parent().find('.error-message').last();
                             if (!namaInput.val().trim()) {
-                                namaInput.addClass('shake');
+                                namaError.text('Nama komisaris wajib diisi');
+                                namaInput.addClass('shake error');
                                 if (!firstErrorField) firstErrorField = namaInput;
                                 valid = false;
                             }
                             if (!ktpInput.val()) {
-                                ktpInput.addClass('shake');
+                                ktpError.text('KTP komisaris wajib diupload');
+                                ktpInput.addClass('shake error');
                                 if (!firstErrorField) firstErrorField = ktpInput;
                                 valid = false;
                             }
@@ -1169,7 +1182,7 @@
                 } else if (step === 4) {
                     // Step 4: KBLI & Bank
                     if (selectedKBLIs.length === 0) {
-                        $('#kbli-search-input').addClass('shake');
+                        $('#kbli-search-input').addClass('shake error');
                         if (!firstErrorField) firstErrorField = '#kbli-search-input';
                         valid = false;
                     }
@@ -1190,7 +1203,9 @@
                 }
 
                 if (!valid && firstErrorField) {
-                    $(firstErrorField).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        $(firstErrorField).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
                 }
 
                 return valid;
