@@ -304,9 +304,26 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
         }
 
         .shake {
@@ -337,6 +354,100 @@
 
         .form-section.active {
             display: block;
+        }
+
+        /* Bottom Sheet Styles */
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .bottom-sheet-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            /* Limit width on desktop */
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            padding: 1.5rem;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-sheet-overlay.show .bottom-sheet {
+            transform: translateY(0);
+        }
+
+        .bottom-sheet-header {
+            flex-shrink: 0;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-sheet-body {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-bottom: 2rem;
+            /* Initial padding */
+        }
+
+        /* Custom Scrollbar for sheet */
+        .bottom-sheet-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .bottom-sheet-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .bottom-sheet-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .kbli-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kbli-item:last-child {
+            border-bottom: none;
+        }
+
+        .kbli-item:hover {
+            background-color: var(--muted);
+        }
+
+        .kbli-item.selected {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
         }
     </style>
 </head>
@@ -497,63 +608,37 @@
                         <div class="mb-6 pb-4 border-b">
                             <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2"><i
                                     class="fas fa-list-alt text-blue-600"></i>KBLI & Bank</h2>
+                            <p class="text-sm text-gray-500 mt-1">Pilih Bidang Usaha (KBLI) dan Bank Rekanan.</p>
                         </div>
-                        <div class="mb-4">
-                            <label for="kbli-search-input" class="form-label">Cari KBLI</label>
-                            <div class="search-container relative">
-                                <input type="text" id="kbli-search-input" class="form-input pl-10"
-                                    placeholder="Cari berdasarkan kode, judul, atau uraian...">
-                                <i
-                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <div class="absolute w-full bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 hidden"
-                                    id="kbli-search-suggestions"></div>
+
+                        <!-- Selected KBLI List -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-md font-medium text-gray-900">KBLI Terpilih (<span
+                                        id="selected-kbli-count">0</span>)</h4>
+                                <button type="button" id="open-kbli-sheet"
+                                    class="btn btn-outline border-dashed text-blue-600 border-blue-200 hover:bg-blue-50 text-sm">
+                                    <i class="fas fa-plus mr-2"></i>Tambah KBLI
+                                </button>
                             </div>
-                        </div>
-                        <div
-                            class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
-                            <div class="flex items-center space-x-2">
-                                <label for="kbli-per-page" class="text-sm text-gray-700">Tampilkan</label>
-                                <select id="kbli-per-page" class="form-input w-auto h-8 py-1">
-                                    <option value="10">10</option>
-                                    <option value="25" selected>25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
+
+                            <div class="space-y-3" id="selected-kbli-container">
+                                <!-- KBLI Items will be rendered here as cards/blocks -->
+                                <div class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-500"
+                                    id="empty-kbli-state">
+                                    <i class="fas fa-clipboard-list text-3xl mb-2 opacity-30"></i>
+                                    <p>Belum ada KBLI yang dipilih</p>
+                                    <p class="text-xs">Klik tombol "Tambah KBLI" untuk memilih bidang usaha.</p>
+                                </div>
                             </div>
-                            <div id="kbli-search-summary" class="text-sm text-gray-600">Menampilkan 0 hasil</div>
+                            <!-- Hidden input for form submission -->
+                            <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
+                            <div class="error-message text-red-500 text-xs mt-1" id="kbli-section-error"></div>
                         </div>
-                        <div class="overflow-x-auto mb-4 border rounded-lg">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-gray-700 font-medium">
-                                    <tr>
-                                        <th class="p-3 border-b">KODE</th>
-                                        <th class="p-3 border-b">JUDUL</th>
-                                        <th class="p-3 border-b">URAIAN</th>
-                                        <th class="p-3 border-b text-center">AKSI</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="kbli-results" class="bg-white divide-y divide-gray-200"></tbody>
-                            </table>
-                        </div>
-                        <div id="kbli-pagination" class="flex justify-center mt-4"></div>
-                        <div class="mt-6">
-                            <h4 class="text-md font-medium text-gray-900 mb-2">KBLI yang Dipilih (<span
-                                    id="selected-kbli-count">0</span>)</h4>
-                            <div class="overflow-x-auto border rounded-lg">
-                                <table class="w-full text-sm text-left">
-                                    <thead class="bg-blue-50 text-blue-800 font-medium">
-                                        <tr>
-                                            <th class="p-3 border-b">KODE</th>
-                                            <th class="p-3 border-b">JUDUL</th>
-                                            <th class="p-3 border-b">URAIAN</th>
-                                            <th class="p-3 border-b text-center">HAPUS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="selected-kbli-body" class="bg-white divide-y divide-gray-200"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm p-5 mb-6 mt-6">
+
+                        <!-- Financial Info / Excess Fee -->
+                        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm p-5 mb-6 mt-6 transition-all duration-300 hidden"
+                            id="kbli-excess-alert">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 text-amber-500 mt-1"><i
                                         class="fas fa-exclamation-triangle fa-lg"></i></div>
@@ -564,7 +649,7 @@
                                         <span class="text-xs text-gray-500 uppercase tracking-wide font-bold mr-2">Batas
                                             Gratis</span><span class="text-sm font-bold text-amber-700">5 KBLI</span>
                                     </div>
-                                    <div id="kbli-doc-options" class="hidden">
+                                    <div id="kbli-doc-options">
                                         <div
                                             class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex gap-3 items-start">
                                             <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
@@ -696,6 +781,34 @@
         </div>
     </div>
 
+    <!-- Bottom Sheet Component -->
+    <div class="bottom-sheet-overlay" id="kbli-bottom-sheet-overlay">
+        <div class="bottom-sheet">
+            <div class="bottom-sheet-header">
+                <h3 class="text-lg font-bold">Pilih KBLI</h3>
+                <button type="button" id="close-kbli-sheet" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <div class="relative">
+                    <input type="text" id="sheet-kbli-search" class="form-input pl-10 bg-gray-50 border-gray-200"
+                        placeholder="Cari kode atau judul KBLI...">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="bottom-sheet-body" id="sheet-kbli-list">
+                <!-- KBLI List Items -->
+                <div class="text-center py-8">
+                    <span class="spinner-border spinner-border-sm text-blue-500"></span>
+                    <p class="text-sm text-gray-500 mt-2">Memuat data KBLI...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
@@ -717,7 +830,7 @@
             function initializeApp() {
                 initializeLocationDropdowns();
                 $('#kbli-search-suggestions').hide();
-                loadAllKBLIs();
+                // loadAllKBLIs();
                 updateSelectedKBLIList();
                 updateFinancialSummary(); // Init financial
                 initializePersonForms();
@@ -837,67 +950,164 @@
                 });
             }
 
-            // KBLI Logic - RESTORED
-            function performKBLISearch(query, page = 1, perPage = 25) {
-                $('#kbli-results').html('<tr><td colspan="4" class="py-8 text-center"><span class="spinner-border spinner-border-sm mr-2"></span>Memuat...</td></tr>');
-                $.ajax({
-                    url: `/api/kbli/search?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`, method: 'GET',
-                    success: function (data) { renderKBLIResults(data.data || [], query); renderKBLIPagination(data); updateKBLISummary(data); },
-                    error: function () { $('#kbli-results').html(`<tr><td colspan="4" class="text-center text-red-500">Gagal memuat.</td></tr>`); }
-                });
-            }
-            function loadAllKBLIs(page = 1, perPage = 25) { performKBLISearch('', page, perPage); }
-            function renderKBLIResults(items, query) {
-                const tbody = $('#kbli-results').empty();
-                if (!items.length) { tbody.html(`<tr><td colspan="4" class="py-4 text-center text-gray-500">Tidak ada hasil.</td></tr>`); return; }
-                items.forEach(item => {
-                    const { kbli, judul, uraian } = item; kbliDetailsCache[kbli] = { kbli, judul, uraian };
-                    const isSel = selectedKBLIs.some(k => k.kbli === kbli);
-                    tbody.append(`<tr data-kbli="${kbli}"><td class="font-mono">${kbli}</td><td>${judul}</td><td>${uraian}</td><td><button type="button" class="kbli-select-btn px-3 py-1 rounded text-sm ${isSel ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 text-white'}" data-kbli="${kbli}" ${isSel ? 'disabled' : ''}>${isSel ? 'Dipilih' : 'Pilih'}</button></td></tr>`);
-                });
-            }
-            function renderKBLIPagination(data) {
-                const div = $('#kbli-pagination').empty();
-                if (!data || data.total <= data.per_page) return;
-                const btn = (p, t, e) => `<button type="button" class="px-3 py-1 mx-1 rounded-lg text-sm kbli-page-btn ${e ? (p === data.current_page ? 'bg-blue-500 text-white' : 'bg-white border text-blue-600') : 'bg-gray-100 text-gray-400'}" data-page="${p}" ${!e ? 'disabled' : ''}>${t}</button>`;
-                div.append(btn(data.current_page - 1, 'Prev', data.current_page > 1));
-                div.append(btn(data.current_page + 1, 'Next', data.current_page < data.last_page));
-            }
-            function updateKBLISummary(data) { $('#kbli-search-summary').text(data.total ? `Menampilkan ${data.from}-${data.to} dari ${data.total}` : '0 hasil'); }
-            $('#kbli-search-input').on('input', function () { clearTimeout(searchTimeout); const q = $(this).val().trim(); searchTimeout = setTimeout(() => { q.length >= 3 ? performKBLISearch(q) : loadAllKBLIs(); }, 400); });
-            $(document).on('click', '.kbli-page-btn', function () { performKBLISearch($('#kbli-search-input').val().trim(), $(this).data('page')); });
-            $(document).on('click', '.kbli-select-btn', function () { addKBLI($(this).data('kbli')); });
-            function addKBLI(kbli) {
-                if (!selectedKBLIs.some(k => k.kbli === kbli) && kbliDetailsCache[kbli]) {
-                    selectedKBLIs.push(kbliDetailsCache[kbli]); updateSelectedKBLIList(); updateFinancialSummary();
-                    $(`tr[data-kbli="${kbli}"] .kbli-select-btn`).text('Dipilih').prop('disabled', true).removeClass('bg-blue-600 text-white').addClass('bg-gray-300');
+            // KBLI Logic - Bottom Sheet Implementation
+            let allKBLIData = []; // Store loaded KBLIs if possible, or just use current result
+
+            // Sheet Control
+            function openKBLISheet() {
+                $('#kbli-bottom-sheet-overlay').addClass('show');
+                $('body').css('overflow', 'hidden'); // Prevent background scrolling
+                if ($('#sheet-kbli-list').children().length === 0 || $('#sheet-kbli-list').find('.spinner-border').length > 0) {
+                    loadKBLIsForSheet();
                 }
             }
+
+            function closeKBLISheet() {
+                $('#kbli-bottom-sheet-overlay').removeClass('show');
+                $('body').css('overflow', '');
+            }
+
+            $('#open-kbli-sheet').click(openKBLISheet);
+            $('#close-kbli-sheet, #kbli-bottom-sheet-overlay').click(function (e) {
+                if (e.target === this) closeKBLISheet();
+            });
+
+            // Search & Render
+            function loadKBLIsForSheet(query = '') {
+                $('#sheet-kbli-list').html('<div class="text-center py-8"><span class="spinner-border spinner-border-sm text-blue-500"></span><p class="text-sm text-gray-500 mt-2">Memuat data KBLI...</p></div>');
+
+                // Use existing API but requesting more items for better scrolling experience? 
+                // Let's stick to 50 for now to keep it responsive
+                $.ajax({
+                    url: `/api/kbli/search?query=${encodeURIComponent(query)}&page=1&per_page=100`,
+                    method: 'GET',
+                    success: function (data) {
+                        renderKBLISheetItems(data.data || []);
+                    },
+                    error: function () {
+                        $('#sheet-kbli-list').html(`<div class="text-center py-8 text-red-500">Gagal memuat data. <button class="text-blue-600 underline" onclick="loadKBLIsForSheet('${query}')">Coba lagi</button></div>`);
+                    }
+                });
+            }
+
+            // Search Input Debounce
+            let sheetSearchTimeout;
+            $('#sheet-kbli-search').on('input', function () {
+                clearTimeout(sheetSearchTimeout);
+                const q = $(this).val().trim();
+                sheetSearchTimeout = setTimeout(() => {
+                    loadKBLIsForSheet(q);
+                }, 400);
+            });
+
+
+            function renderKBLISheetItems(items) {
+                const container = $('#sheet-kbli-list').empty();
+                if (!items.length) { container.html('<div class="text-center py-8 text-gray-500">Tidak ada data KBLI ditemukan.</div>'); return; }
+
+                items.forEach(item => {
+                    kbliDetailsCache[item.kbli] = item;
+                    const isSelected = selectedKBLIs.some(k => k.kbli === item.kbli);
+                    container.append(`
+                        <div class="kbli-item ${isSelected ? 'selected' : ''}" data-kbli="${item.kbli}">
+                            <div class="flex-grow pr-4 pointer-events-none">
+                                <span class="inline-block bg-blue-100 text-blue-800 text-xs font-mono font-bold px-2 py-1 rounded mb-1">${item.kbli}</span>
+                                <p class="text-sm font-medium text-gray-900 leading-snug">${item.judul}</p>
+                            </div>
+                            <div class="flex-shrink-0 text-blue-600 ${isSelected ? '' : 'hidden'} check-icon pointer-events-none">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            $(document).on('click', '.kbli-item', function () {
+                const kbli = $(this).data('kbli');
+                const index = selectedKBLIs.findIndex(k => k.kbli === kbli);
+
+                if (index >= 0) {
+                    selectedKBLIs.splice(index, 1);
+                    $(this).removeClass('selected');
+                    $(this).find('.check-icon').addClass('hidden');
+                } else {
+                    if (kbliDetailsCache[kbli]) {
+                        selectedKBLIs.push(kbliDetailsCache[kbli]);
+                        $(this).addClass('selected');
+                        $(this).find('.check-icon').removeClass('hidden');
+                    }
+                }
+                updateSelectedKBLIList();
+                updateFinancialSummary();
+            });
+
+            function updateSelectedKBLIList() {
+                const container = $('#selected-kbli-container');
+                const emptyState = $('#empty-kbli-state');
+                $('#selected-kbli-count').text(selectedKBLIs.length);
+                $('#kbli_selected').val(JSON.stringify(selectedKBLIs));
+
+                // Remove all current items except empty state
+                container.find('.selected-kbli-card').remove();
+
+                if (selectedKBLIs.length === 0) {
+                    emptyState.removeClass('hidden');
+                } else {
+                    emptyState.addClass('hidden');
+                    selectedKBLIs.forEach(k => {
+                        container.append(`
+                            <div class="selected-kbli-card bg-white border border-gray-200 rounded-lg p-3 flex justify-between items-start shadow-sm hover:border-blue-300 transition-colors">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded font-mono">${k.kbli}</span>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-800">${k.judul}</p>
+                                </div>
+                                <button type="button" onclick="removeKBLI('${k.kbli}')" class="text-gray-400 hover:text-red-500 ml-3 mt-1">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        `);
+                    });
+                }
+
+                // Clear validation error if any
+                if (selectedKBLIs.length > 0) {
+                    $('#kbli-search-input').removeClass('shake error'); // Old selector, but safe to leave or ignore
+                    $('#kbli-section-error').text('');
+                }
+            }
+
             function removeKBLI(kbli) {
-                selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli); updateSelectedKBLIList(); updateFinancialSummary();
-                $(`tr[data-kbli="${kbli}"] .kbli-select-btn`).text('Pilih').prop('disabled', false).addClass('bg-blue-600 text-white').removeClass('bg-gray-300');
+                selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli);
+                updateSelectedKBLIList();
+                updateFinancialSummary();
+                // Also update sheet if open (optional but good)
+                const sheetItem = $(`.kbli-item[data-kbli="${kbli}"]`);
+                if (sheetItem.length) {
+                    sheetItem.removeClass('selected').find('.check-icon').addClass('hidden');
+                }
             }
             window.removeKBLI = removeKBLI;
-            function updateSelectedKBLIList() {
-                const b = $('#selected-kbli-body').empty(); $('#selected-kbli-count').text(selectedKBLIs.length);
-                if (!selectedKBLIs.length) b.html('<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada KBLI.</td></tr>');
-                else selectedKBLIs.forEach(k => b.append(`<tr><td>${k.kbli}</td><td>${k.judul}</td><td>${k.uraian}</td><td class="text-center"><button type="button" onclick="removeKBLI('${k.kbli}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`));
-                $('#kbli_selected').val(JSON.stringify(selectedKBLIs));
-            }
 
             // Financial Summary
             function updateFinancialSummary() {
                 const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
                 $('#excess-kbli-count').text(excess + ' Kode');
+                
                 if (excess > 0) {
-                    $('#kbli-doc-options').removeClass('hidden');
+                    $('#kbli-excess-alert').removeClass('hidden'); // Show the wrapper
+                    // $('#kbli-doc-options').removeClass('hidden'); // No longer needed as separate toggle if wrapper handles it, but keeps logic structure
+                    
                     const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
-                    kbliDocOption = opt; $('#kbli_doc_option').val(opt);
+                    kbliDocOption = opt; 
+                    $('#kbli_doc_option').val(opt);
+                    
                     const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
                     const total = excess * fee;
                     $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
                 } else {
-                    $('#kbli-doc-options').addClass('hidden');
+                    $('#kbli-excess-alert').addClass('hidden'); // Hide the wrapper
                     $('#total-kbli-charge').text('Rp0');
                 }
                 updatePaymentSummary();
@@ -1131,7 +1341,7 @@
                         if (!firstErrorField) firstErrorField = '#direktur-container';
                         valid = false;
                     } else {
-                        direkturEntries.each(function(index) {
+                        direkturEntries.each(function (index) {
                             const entry = $(this);
                             const namaInput = entry.find('input[name="direktur[' + index + '][nama]"]');
                             const ktpInput = entry.find('input[name="direktur[' + index + '][ktp]"]');
@@ -1159,7 +1369,7 @@
                         if (!firstErrorField) firstErrorField = '#komisaris-container';
                         valid = false;
                     } else {
-                        komisarisEntries.each(function(index) {
+                        komisarisEntries.each(function (index) {
                             const entry = $(this);
                             const namaInput = entry.find('input[name="komisaris[' + index + '][nama]"]');
                             const ktpInput = entry.find('input[name="komisaris[' + index + '][ktp]"]');
