@@ -1054,18 +1054,35 @@
                     emptyState.removeClass('hidden');
                 } else {
                     emptyState.addClass('hidden');
+                    
                     selectedKBLIs.forEach(k => {
+                        // Safety check
+                        if (!k || !k.kbli) return;
+                        
+                        // Create UID for accordion - safely cast to string
+                        const kbliCode = String(k.kbli);
+                        const uid = kbliCode.replace(/[^a-zA-Z0-9]/g, '');
+                        
                         container.append(`
-                            <div class="selected-kbli-card bg-white border border-gray-200 rounded-lg p-3 flex justify-between items-start shadow-sm hover:border-blue-300 transition-colors">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded font-mono">${k.kbli}</span>
+                            <div class="selected-kbli-card bg-white border border-gray-200 rounded-lg shadow-sm transition-colors hover:border-blue-300">
+                                <div class="p-3 flex justify-between items-start">
+                                    <div class="flex-grow cursor-pointer" onclick="toggleDetail('${uid}')">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded font-mono">${kbliCode}</span>
+                                            <div class="text-xs text-blue-600 flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-full">
+                                                <span>Lihat Uraian</span>
+                                                <i class="fas fa-chevron-down text-blue-500 transition-transform duration-200" id="arrow-${uid}"></i>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-800">${k.judul || 'Tanpa Judul'}</p>
                                     </div>
-                                    <p class="text-sm font-medium text-gray-800">${k.judul}</p>
+                                    <button type="button" onclick="removeKBLI('${kbliCode}')" class="text-gray-400 hover:text-red-500 ml-3 mt-1 flex-shrink-0">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
-                                <button type="button" onclick="removeKBLI('${k.kbli}')" class="text-gray-400 hover:text-red-500 ml-3 mt-1">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <div id="detail-${uid}" class="hidden border-t border-gray-100 p-3 bg-gray-50 rounded-b-lg">
+                                    <p class="text-xs text-gray-600 leading-relaxed text-justify">${k.uraian || 'Tidak ada uraian tersedia.'}</p>
+                                </div>
                             </div>
                         `);
                     });
@@ -1073,10 +1090,25 @@
 
                 // Clear validation error if any
                 if (selectedKBLIs.length > 0) {
-                    $('#kbli-search-input').removeClass('shake error'); // Old selector, but safe to leave or ignore
+                    $('#kbli-search-input').removeClass('shake error');
                     $('#kbli-section-error').text('');
                 }
             }
+
+            window.toggleDetail = function (uid) {
+                const detail = $(`#detail-${uid}`);
+                const arrow = $(`#arrow-${uid}`);
+
+                if (detail.hasClass('hidden')) {
+                    detail.removeClass('hidden').hide().slideDown(200);
+                    arrow.css('transform', 'rotate(180deg)');
+                } else {
+                    detail.slideUp(200, function () {
+                        $(this).addClass('hidden');
+                    });
+                    arrow.css('transform', 'rotate(0deg)');
+                }
+            };
 
             function removeKBLI(kbli) {
                 selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli);
@@ -1094,15 +1126,15 @@
             function updateFinancialSummary() {
                 const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
                 $('#excess-kbli-count').text(excess + ' Kode');
-                
+
                 if (excess > 0) {
                     $('#kbli-excess-alert').removeClass('hidden'); // Show the wrapper
                     // $('#kbli-doc-options').removeClass('hidden'); // No longer needed as separate toggle if wrapper handles it, but keeps logic structure
-                    
+
                     const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
-                    kbliDocOption = opt; 
+                    kbliDocOption = opt;
                     $('#kbli_doc_option').val(opt);
-                    
+
                     const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
                     const total = excess * fee;
                     $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
