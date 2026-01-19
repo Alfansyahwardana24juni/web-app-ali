@@ -657,8 +657,13 @@
                                             <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
                                             <div class="text-sm text-blue-800">
                                                 <p class="font-bold mb-1">Anda telah memilih lebih dari 5 KBLI.</p>
-                                                <p class="leading-snug">Setiap kelebihan 1 KBLI akan dikenakan biaya
-                                                    tambahan.</p>
+                                                <p class="leading-snug">
+                            Setiap kelebihan 1 KBLI akan dikenakan biaya:
+                            <ul class="list-disc list-inside mt-1 ml-1 text-blue-700">
+                                <li><strong>Rp15.000</strong> jika hanya Akta.</li>
+                                <li><strong>Rp115.000</strong> jika Akta + NIB (Rp15rb + Rp100rb).</li>
+                            </ul>
+                        </p>
                                             </div>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 mb-3 block">Pilih dokumen untuk
@@ -688,7 +693,7 @@
                                         class="mt-4 pt-3 border-t border-amber-200/60 flex justify-between items-center">
                                         <div class="text-sm text-gray-600">
                                             <p>Kelebihan: <span id="excess-kbli-count" class="font-bold text-gray-800">0
-                                                    Kode</span></p>
+                                                    KBLI</span></p>
                                         </div>
                                         <div class="text-right">
                                             <p class="text-xs text-gray-500 uppercase font-bold">Total Tambahan</p>
@@ -1139,24 +1144,21 @@
             // Financial Summary
             function updateFinancialSummary() {
                 const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
-                $('#excess-kbli-count').text(excess + ' Kode');
+                $('#excess-kbli-count').text(excess + ' KBLI');
 
-                if (selectedKBLIs.length > 0) {
-                    $('#kbli-excess-alert').removeClass('hidden'); // Show the alert when any KBLI is selected
-                    if (excess > 0) {
-                        $('#kbli-doc-options').removeClass('hidden'); // Show doc options only if excess > 0
-                        const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
-                        kbliDocOption = opt;
-                        $('#kbli_doc_option').val(opt);
-                        const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
-                        const total = excess * fee;
-                        $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
-                    } else {
-                        $('#kbli-doc-options').addClass('hidden'); // Hide doc options if no excess
-                        $('#total-kbli-charge').text('Rp0');
-                    }
+                // Always show the alert in step 4
+                $('#kbli-excess-alert').removeClass('hidden');
+
+                if (excess > 0) {
+                    $('#kbli-doc-options').removeClass('hidden'); // Show doc options only if excess > 0
+                    const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
+                    kbliDocOption = opt;
+                    $('#kbli_doc_option').val(opt);
+                    const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
+                    const total = excess * fee;
+                    $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
                 } else {
-                    $('#kbli-excess-alert').addClass('hidden'); // Hide the alert if no KBLI selected
+                    $('#kbli-doc-options').addClass('hidden'); // Hide doc options if no excess
                     $('#total-kbli-charge').text('Rp0');
                 }
                 updatePaymentSummary();
