@@ -614,7 +614,8 @@
                         <!-- Selected KBLI List -->
                         <div class="mb-6">
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="text-md font-medium text-gray-900"><i class="fas fa-check-circle mr-2 text-green-500"></i>KBLI Terpilih (<span
+                                <h4 class="text-md font-medium text-gray-900"><i
+                                        class="fas fa-check-circle mr-2 text-green-500"></i>KBLI Terpilih (<span
                                         id="selected-kbli-count">0</span>)</h4>
                                 <button type="button" id="open-kbli-sheet"
                                     class="btn btn-outline border-dashed text-blue-600 border-blue-200 hover:bg-blue-50 text-sm">
@@ -622,7 +623,8 @@
                                 </button>
                             </div>
 
-                            <p class="text-xs text-gray-500 mt-1 pb-1"><span class="text-[#b45309]">*</span>Pilih minimal 1 kbli</p>
+                            <p class="text-xs text-gray-500 mt-1 pb-1"><span class="text-[#b45309]">*</span>Pilih
+                                minimal 1 kbli</p>
 
                             <div class="space-y-3" id="selected-kbli-container">
                                 <!-- KBLI Items will be rendered here as cards/blocks -->
@@ -658,12 +660,13 @@
                                             <div class="text-sm text-blue-800">
                                                 <p class="font-bold mb-1">Anda telah memilih lebih dari 5 KBLI.</p>
                                                 <p class="leading-snug">
-                            Setiap kelebihan 1 KBLI akan dikenakan biaya:
-                            <ul class="list-disc list-inside mt-1 ml-1 text-blue-700">
-                                <li><strong>Rp15.000</strong> jika hanya Akta.</li>
-                                <li><strong>Rp115.000</strong> jika Akta + NIB (Rp15rb + Rp100rb).</li>
-                            </ul>
-                        </p>
+                                                    Setiap kelebihan 1 KBLI akan dikenakan biaya:
+                                                <ul class="list-disc list-inside mt-1 ml-1 text-blue-700">
+                                                    <li><strong>Rp15.000</strong> jika hanya Akta.</li>
+                                                    <li><strong>Rp115.000</strong> jika Akta + NIB (Rp15rb + Rp100rb).
+                                                    </li>
+                                                </ul>
+                                                </p>
                                             </div>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 mb-3 block">Pilih dokumen untuk
@@ -711,7 +714,8 @@
                         <div class="mt-8 border-t pt-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2"><i
                                     class="fas fa-university text-blue-600"></i>Pilih Rekanan Bank</h3>
-                                    <p class="text-sm text-gray-600 mb-4">Silakan pilih salah satu bank rekanan kami untuk proses pembukaan rekening perusahaan anda.</p>
+                            <p class="text-sm text-gray-600 mb-4">Silakan pilih salah satu bank rekanan kami untuk
+                                proses pembukaan rekening perusahaan anda.</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bank-options"></div>
                             <input type="hidden" name="selected_bank" id="selected_bank" value="">
                             <div class="error-message text-red-500 text-xs mt-1" id="selected_bank-error"></div>
@@ -1069,15 +1073,15 @@
                     emptyState.removeClass('hidden');
                 } else {
                     emptyState.addClass('hidden');
-                    
+
                     selectedKBLIs.forEach(k => {
                         // Safety check
                         if (!k || !k.kbli) return;
-                        
+
                         // Create UID for accordion - safely cast to string
                         const kbliCode = String(k.kbli);
                         const uid = kbliCode.replace(/[^a-zA-Z0-9]/g, '');
-                        
+
                         container.append(`
                             <div class="selected-kbli-card bg-white border border-gray-200 rounded-lg shadow-sm transition-colors hover:border-blue-300">
                                 <div class="p-3 flex justify-between items-start">
@@ -1345,7 +1349,15 @@
                 }
                 $('#prev-step-btn').prop('disabled', step === 1);
                 if (step === 5) {
-                    next.html(`<i class="fas fa-paper-plane mr-2"></i> ${isEdit ? 'Simpan Perubahan' : 'Ajukan Pendirian'}`).removeClass('btn-primary').addClass('bg-green-600 hover:bg-green-700 text-white').off('click').on('click', () => $('#pendirian-cv-form').submit());
+                    next.html(`<i class="fas fa-paper-plane mr-2"></i> ${isEdit ? 'Simpan Perubahan' : 'Ajukan Pendirian'}`).removeClass('btn-primary').addClass('bg-green-600 hover:bg-green-700 text-white').off('click').on('click', () => {
+                        if (!$('#payment_proof').val()) {
+                            $('#payment_proof-error').text('Bukti pembayaran wajib diupload');
+                            $('#payment-proof-container').addClass('shake');
+                            $('#payment-proof-container').get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            return;
+                        }
+                        $('#pendirian-cv-form').submit();
+                    });
                 } else {
                     next.html('Lanjut <i class="fas fa-arrow-right ml-2"></i>').addClass('btn-primary').removeClass('bg-green-600 hover:bg-green-700 text-white').off('click').on('click', () => {
                         if (validateStep(step)) { const n = step + 1; showStep(n); updateProgressIndicator(n); updateNavigationButtons(n); }
