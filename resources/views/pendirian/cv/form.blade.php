@@ -622,6 +622,8 @@
                                 </button>
                             </div>
 
+                            <p class="text-xs text-gray-500 mt-1 pb-1">*Pilih minimal 1 kbli</p>
+
                             <div class="space-y-3" id="selected-kbli-container">
                                 <!-- KBLI Items will be rendered here as cards/blocks -->
                                 <div class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-500"
@@ -649,7 +651,7 @@
                                         <span class="text-xs text-gray-500 uppercase tracking-wide font-bold mr-2">Batas
                                             Gratis</span><span class="text-sm font-bold text-amber-700">5 KBLI</span>
                                     </div>
-                                    <div id="kbli-doc-options">
+                                    <div id="kbli-doc-options" class="hidden">
                                         <div
                                             class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 flex gap-3 items-start">
                                             <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
@@ -963,12 +965,14 @@
             }
 
             function closeKBLISheet() {
+                console.log('Closing KBLI sheet');
                 $('#kbli-bottom-sheet-overlay').removeClass('show');
                 $('body').css('overflow', '');
             }
 
             $('#open-kbli-sheet').click(openKBLISheet);
-            $('#close-kbli-sheet, #kbli-bottom-sheet-overlay').click(function (e) {
+            $('#close-kbli-sheet').click(closeKBLISheet);
+            $('#kbli-bottom-sheet-overlay').click(function (e) {
                 if (e.target === this) closeKBLISheet();
             });
 
@@ -1041,6 +1045,11 @@
                 updateFinancialSummary();
             });
 
+            $(document).on('click', '.remove-kbli-btn', function () {
+                const kbli = $(this).data('kbli');
+                removeKBLI(kbli);
+            });
+
             function updateSelectedKBLIList() {
                 const container = $('#selected-kbli-container');
                 const emptyState = $('#empty-kbli-state');
@@ -1076,7 +1085,7 @@
                                         </div>
                                         <p class="text-sm font-medium text-gray-800">${k.judul || 'Tanpa Judul'}</p>
                                     </div>
-                                    <button type="button" onclick="removeKBLI('${kbliCode}')" class="text-gray-400 hover:text-red-500 ml-3 mt-1 flex-shrink-0">
+                                    <button type="button" class="remove-kbli-btn text-gray-400 hover:text-red-500 ml-3 mt-1 flex-shrink-0" data-kbli="${kbliCode}">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -1111,7 +1120,12 @@
             };
 
             function removeKBLI(kbli) {
-                selectedKBLIs = selectedKBLIs.filter(k => k.kbli !== kbli);
+                console.log('Removing KBLI:', kbli, 'Current selectedKBLIs:', selectedKBLIs);
+                selectedKBLIs = selectedKBLIs.filter(k => {
+                    console.log('Checking k.kbli:', k.kbli, 'vs kbli:', kbli, 'equal:', k.kbli === kbli);
+                    return k.kbli !== kbli;
+                });
+                console.log('After filter:', selectedKBLIs);
                 updateSelectedKBLIList();
                 updateFinancialSummary();
                 // Also update sheet if open (optional but good)
@@ -1127,19 +1141,22 @@
                 const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
                 $('#excess-kbli-count').text(excess + ' Kode');
 
-                if (excess > 0) {
-                    $('#kbli-excess-alert').removeClass('hidden'); // Show the wrapper
-                    // $('#kbli-doc-options').removeClass('hidden'); // No longer needed as separate toggle if wrapper handles it, but keeps logic structure
-
-                    const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
-                    kbliDocOption = opt;
-                    $('#kbli_doc_option').val(opt);
-
-                    const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
-                    const total = excess * fee;
-                    $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
+                if (selectedKBLIs.length > 0) {
+                    $('#kbli-excess-alert').removeClass('hidden'); // Show the alert when any KBLI is selected
+                    if (excess > 0) {
+                        $('#kbli-doc-options').removeClass('hidden'); // Show doc options only if excess > 0
+                        const opt = $('input[name="kbli_doc_option_radio"]:checked').val();
+                        kbliDocOption = opt;
+                        $('#kbli_doc_option').val(opt);
+                        const fee = opt === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
+                        const total = excess * fee;
+                        $('#total-kbli-charge').text('Rp' + total.toLocaleString('id-ID'));
+                    } else {
+                        $('#kbli-doc-options').addClass('hidden'); // Hide doc options if no excess
+                        $('#total-kbli-charge').text('Rp0');
+                    }
                 } else {
-                    $('#kbli-excess-alert').addClass('hidden'); // Hide the wrapper
+                    $('#kbli-excess-alert').addClass('hidden'); // Hide the alert if no KBLI selected
                     $('#total-kbli-charge').text('Rp0');
                 }
                 updatePaymentSummary();
