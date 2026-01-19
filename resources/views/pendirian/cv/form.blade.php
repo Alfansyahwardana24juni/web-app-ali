@@ -821,6 +821,26 @@
         </div>
     </div>
 
+    <!-- Modal Sukses Pengajuan -->
+    <div id="submission-success-modal" style="display: none;"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1100]">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                    <i class="fas fa-check text-3xl text-green-600"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-2">Pengajuan Terkirim</h2>
+            <p class="text-center text-gray-600 mb-6 leading-relaxed">
+                Pengajuan anda sedang di proses. Silakan tunggu konfirmasi dari kami.
+            </p>
+            <button id="lanjut-btn" type="button"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                Lanjut
+            </button>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
@@ -1356,7 +1376,30 @@
                             $('#payment-proof-container').get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
                             return;
                         }
-                        $('#pendirian-cv-form').submit();
+
+                        // AJAX Submission
+                        const btn = next;
+                        const originalContent = btn.html();
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...');
+
+                        const form = $('#pendirian-cv-form')[0];
+                        const formData = new FormData(form);
+
+                        $.ajax({
+                            url: $(form).attr('action'),
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                $('#submission-success-modal').fadeIn();
+                            },
+                            error: function (xhr) {
+                                btn.prop('disabled', false).html(originalContent);
+                                console.error(xhr);
+                                alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
+                            }
+                        });
                     });
                 } else {
                     next.html('Lanjut <i class="fas fa-arrow-right ml-2"></i>').addClass('btn-primary').removeClass('bg-green-600 hover:bg-green-700 text-white').off('click').on('click', () => {
@@ -1507,6 +1550,11 @@
             }
 
             initializeApp();
+
+            // Success Modal Lanjut Button
+            $('#lanjut-btn').click(function () {
+                window.location.href = '/pendirian/cv/processing';
+            });
         });
     </script>
 </body>
