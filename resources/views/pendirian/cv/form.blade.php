@@ -614,7 +614,7 @@
                         <!-- Selected KBLI List -->
                         <div class="mb-6">
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="text-md font-medium text-gray-900">KBLI Terpilih (<span
+                                <h4 class="text-md font-medium text-gray-900"><i class="fas fa-check-circle mr-2 text-green-500"></i>KBLI Terpilih (<span
                                         id="selected-kbli-count">0</span>)</h4>
                                 <button type="button" id="open-kbli-sheet"
                                     class="btn btn-outline border-dashed text-blue-600 border-blue-200 hover:bg-blue-50 text-sm">
@@ -622,7 +622,7 @@
                                 </button>
                             </div>
 
-                            <p class="text-xs text-gray-500 mt-1 pb-1">*Pilih minimal 1 kbli</p>
+                            <p class="text-xs text-gray-500 mt-1 pb-1"><span class="text-[#b45309]">*</span>Pilih minimal 1 kbli</p>
 
                             <div class="space-y-3" id="selected-kbli-container">
                                 <!-- KBLI Items will be rendered here as cards/blocks -->
