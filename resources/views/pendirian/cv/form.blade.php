@@ -711,6 +711,7 @@
                         <div class="mt-8 border-t pt-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2"><i
                                     class="fas fa-university text-blue-600"></i>Pilih Rekanan Bank</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Silakan pilih salah satu bank rekanan kami untuk proses pembukaan rekening perusahaan anda.</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bank-options"></div>
                             <input type="hidden" name="selected_bank" id="selected_bank" value="">
                             <div class="error-message text-red-500 text-xs mt-1" id="selected_bank-error"></div>
@@ -733,7 +734,7 @@
                                 <li>Transfer biaya</li>
                                 <li>Simpan bukti</li>
                                 <li>Upload bukti</li>
-                                <li>Klik "Ajukan"</li>
+                                <li>Klik "Ajukan Pendirian"</li>
                             </ol>
                         </div>
                         <div class="form-group">
@@ -1166,19 +1167,40 @@
             $('input[name="kbli_doc_option_radio"]').change(updateFinancialSummary);
 
             function updatePaymentSummary() {
-                let html = `<div class="flex justify-between text-sm"><span>Biaya Jasa Pendirian CV</span><span class="font-bold">Rp2.500.000</span></div>`; // Base price mock
                 const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
+                let html = `<div class="text-sm space-y-2">`;
+                html += `<div class="flex justify-between"><span>Layanan Dasar (5 KBLI pertama)</span><span class="font-bold">Rp0</span></div>`;
                 if (excess > 0) {
                     const fee = kbliDocOption === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
-                    html += `<div class="flex justify-between text-sm text-amber-700"><span>Biaya Tambahan KBLI (${excess}x)</span><span class="font-bold">Rp${(excess * fee).toLocaleString('id-ID')}</span></div>`;
+                    const docType = kbliDocOption === 'akta' ? 'Akta' : 'Akta + NIB';
+                    html += `<div class="flex justify-between"><span>${docType} untuk ${excess} KBLI</span><span class="font-bold">Rp${(excess * fee).toLocaleString('id-ID')}</span></div>`;
+                    html += `<div class="flex justify-between text-amber-700"><span>Total Biaya Tambahan</span><span class="font-bold">Rp${(excess * fee).toLocaleString('id-ID')}</span></div>`;
                 }
+                html += `</div>`;
                 $('#payment-summary').html(html);
             }
             function updateSubmissionSummary() {
+                const namaPerusahaan = $('#nama_perusahaan').val() || '-';
+                const lokasi = ($('#province option:selected').text() || '') + ', ' + ($('#city option:selected').text() || '');
+                const jumlahDirektur = $('#direktur-container .person-entry').length;
+                const jumlahKomisaris = $('#komisaris-container .person-entry').length;
+                const jumlahKBLI = selectedKBLIs.length;
+                const rekananBank = selectedBank || '-';
+                const excess = Math.max(0, selectedKBLIs.length - MAX_KBLI_FREE);
+                const fee = kbliDocOption === 'akta' ? AKTA_FEE : (AKTA_FEE + NIB_FEE);
+                const total = excess * fee;
                 $('#submission-summary').html(`
-                      <div class="flex justify-between"><span>Perusahaan:</span> <strong>${$('#nama_perusahaan').val() || '-'}</strong></div>
-                      <div class="flex justify-between"><span>Direktur:</span> <strong>${$('#direktur-container .person-entry').length} Org</strong></div>
-                      <div class="flex justify-between"><span>KBLI:</span> <strong>${selectedKBLIs.length} Kode</strong></div>
+                      <div class="text-sm space-y-1">
+                          <div><strong>Nama Perusahaan:</strong> ${namaPerusahaan}</div>
+                          <div><strong>Lokasi:</strong> ${lokasi}</div>
+                          <div><strong>Jumlah Direktur:</strong> ${jumlahDirektur}</div>
+                          <div><strong>Jumlah Komisaris:</strong> ${jumlahKomisaris}</div>
+                          <div><strong>Jumlah KBLI:</strong> ${jumlahKBLI}</div>
+                          <div><strong>Rekanan Bank:</strong> ${rekananBank}</div>
+                          <div><strong>Rincian Biaya per Unit:</strong> Akta Rp15.000, NIB Rp100.000</div>
+                          <div><strong>Kelebihan:</strong> ${excess} × Rp${fee.toLocaleString('id-ID')} = Rp${total.toLocaleString('id-ID')}</div>
+                          <div><strong>Total Biaya Tambahan:</strong> Rp${total.toLocaleString('id-ID')}</div>
+                      </div>
                   `);
             }
 
