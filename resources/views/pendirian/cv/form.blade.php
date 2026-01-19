@@ -298,16 +298,14 @@
             width: 100% !important;
         }
 
-        @keyframes slide-in {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .shake {
+            animation: shake 0.5s ease-in-out;
         }
 
         .toast {
@@ -956,7 +954,7 @@
             $(document).on('change', '.file-input-preview, #payment_proof', function (event) {
                 const file = event.target.files[0];
                 const isPaymentProof = $(this).attr('id') === 'payment_proof';
-                const previewContainer = isPaymentProof ? $('#payment-proof-preview') : $(this).next('.file-preview');
+                const previewContainer = isPaymentProof ? $('#payment-proof-preview') : $(this).siblings('.file-preview');
 
                 if (file) {
                     // Validation
@@ -998,7 +996,7 @@
                         if (file.type.match('image.*')) {
                             const reader = new FileReader();
                             reader.onload = function (e) {
-                                previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span></div>`).removeClass('hidden');
+                                previewContainer.html(`<div class="relative inline-block"><img src="${e.target.result}" class="max-h-48 rounded border border-gray-200 shadow-sm"><button type="button" class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview" title="Hapus file"><i class="fas fa-times"></i></button></div>`).removeClass('hidden');
                             }
                             reader.readAsDataURL(file);
                         } else {
@@ -1015,7 +1013,7 @@
                                         <p class="text-sm font-medium text-gray-800 break-all line-clamp-1 max-w-[200px]">${file.name}</p>
                                         <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(0)} KB</p>
                                     </div>
-                                    <span class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview"><i class="fas fa-times"></i></span>
+                                    <button type="button" class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer remove-preview" title="Hapus file"><i class="fas fa-times"></i></button>
                                 </div>
                             `).removeClass('hidden');
                         }
@@ -1029,7 +1027,7 @@
             // Remove preview handler
             $(document).on('click', '.remove-preview', function () {
                 const container = $(this).closest('.file-preview');
-                const input = container.prev('.file-input-preview');
+                const input = container.siblings('.file-input-preview');
                 input.val(''); // Clear input
                 container.empty().addClass('hidden');
             });
@@ -1070,16 +1068,131 @@
 
             // Validation
             function validateStep(step) {
-                let valid = true; $('.error-message').text('');
-                // Include specific validation from original file here (simplified for space)
+                let valid = true;
+                $('.error-message').text(''); // Clear previous errors
+                $('.form-input, .person-entry input').removeClass('shake'); // Remove previous shakes
+
+                let firstErrorField = null;
+
                 if (step === 1) {
-                    if (!$('#nama_perusahaan').val()) { $('#nama_perusahaan-error').text('Wajib diisi'); valid = false; }
-                    if (!$('#province').val()) { $('#province-error').text('Wajib dipilih'); valid = false; }
+                    // Step 1: Informasi Perusahaan
+                    if (!$('#nama_perusahaan').val().trim()) {
+                        $('#nama_perusahaan-error').text('Nama perusahaan wajib diisi');
+                        $('#nama_perusahaan').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#nama_perusahaan';
+                        valid = false;
+                    }
+                    if (!$('#province').val()) {
+                        $('#province-error').text('Provinsi wajib dipilih');
+                        $('#province').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#province';
+                        valid = false;
+                    }
+                    if (!$('#city').val()) {
+                        $('#city-error').text('Kota/Kabupaten wajib dipilih');
+                        $('#city').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#city';
+                        valid = false;
+                    }
+                    if (!$('#district').val()) {
+                        $('#district-error').text('Kecamatan wajib dipilih');
+                        $('#district').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#district';
+                        valid = false;
+                    }
+                    if (!$('#village').val()) {
+                        $('#village-error').text('Desa/Kelurahan wajib dipilih');
+                        $('#village').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#village';
+                        valid = false;
+                    }
+                    if (!$('#alamat_lengkap').val().trim()) {
+                        $('#alamat_lengkap-error').text('Alamat lengkap wajib diisi');
+                        $('#alamat_lengkap').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#alamat_lengkap';
+                        valid = false;
+                    }
+                    if (!$('#kode_pos').val().trim()) {
+                        $('#kode_pos-error').text('Kode pos wajib diisi');
+                        $('#kode_pos').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#kode_pos';
+                        valid = false;
+                    }
+                } else if (step === 2) {
+                    // Step 2: Direktur
+                    const direkturEntries = $('#direktur-container .person-entry');
+                    if (direkturEntries.length === 0) {
+                        $('#direktur-container').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#direktur-container';
+                        valid = false;
+                    } else {
+                        direkturEntries.each(function(index) {
+                            const entry = $(this);
+                            const namaInput = entry.find('input[name="direktur[' + index + '][nama]"]');
+                            const ktpInput = entry.find('input[name="direktur[' + index + '][ktp]"]');
+                            if (!namaInput.val().trim()) {
+                                namaInput.addClass('shake');
+                                if (!firstErrorField) firstErrorField = namaInput;
+                                valid = false;
+                            }
+                            if (!ktpInput.val()) {
+                                ktpInput.addClass('shake');
+                                if (!firstErrorField) firstErrorField = ktpInput;
+                                valid = false;
+                            }
+                        });
+                    }
+                } else if (step === 3) {
+                    // Step 3: Komisaris
+                    const komisarisEntries = $('#komisaris-container .person-entry');
+                    if (komisarisEntries.length === 0) {
+                        $('#komisaris-container').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#komisaris-container';
+                        valid = false;
+                    } else {
+                        komisarisEntries.each(function(index) {
+                            const entry = $(this);
+                            const namaInput = entry.find('input[name="komisaris[' + index + '][nama]"]');
+                            const ktpInput = entry.find('input[name="komisaris[' + index + '][ktp]"]');
+                            if (!namaInput.val().trim()) {
+                                namaInput.addClass('shake');
+                                if (!firstErrorField) firstErrorField = namaInput;
+                                valid = false;
+                            }
+                            if (!ktpInput.val()) {
+                                ktpInput.addClass('shake');
+                                if (!firstErrorField) firstErrorField = ktpInput;
+                                valid = false;
+                            }
+                        });
+                    }
+                } else if (step === 4) {
+                    // Step 4: KBLI & Bank
+                    if (selectedKBLIs.length === 0) {
+                        $('#kbli-search-input').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#kbli-search-input';
+                        valid = false;
+                    }
+                    if (!selectedBank) {
+                        $('#selected_bank-error').text('Bank wajib dipilih');
+                        $('#bank-options').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#bank-options';
+                        valid = false;
+                    }
+                } else if (step === 5) {
+                    // Step 5: Pembayaran
+                    if (!$('#payment_proof').val()) {
+                        $('#payment_proof-error').text('Bukti pembayaran wajib diupload');
+                        $('#payment-proof-container').addClass('shake');
+                        if (!firstErrorField) firstErrorField = '#payment-proof-container';
+                        valid = false;
+                    }
                 }
-                if (step === 4) {
-                    if (!selectedKBLIs.length) { alert('Pilih minimal 1 KBLI'); valid = false; }
-                    if (!selectedBank) { $('#selected_bank-error').text('Pilih Bank'); valid = false; }
+
+                if (!valid && firstErrorField) {
+                    $(firstErrorField).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
+
                 return valid;
             }
 
