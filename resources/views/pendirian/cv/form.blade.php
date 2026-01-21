@@ -707,7 +707,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="kbli_selected" id="kbli_selected" value="[]">
+
                         <input type="hidden" id="kbli_doc_option" name="kbli_doc_option" value="">
                         <input type="hidden" id="include_akta" name="include_akta" value="0">
                         <input type="hidden" id="include_nib" name="include_nib" value="0">
