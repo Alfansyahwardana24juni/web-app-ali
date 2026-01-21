@@ -449,6 +449,43 @@
             background-color: #eff6ff;
             border-color: #bfdbfe;
         }
+
+        /* Bank Option Styles */
+        .bank-option {
+            cursor: pointer;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background-color: white;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .bank-option:hover {
+            background-color: var(--muted);
+            border-color: var(--accent);
+        }
+
+        .bank-option.selected {
+            border-color: var(--accent);
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px rgba(0, 119, 230, 0.1);
+        }
+
+        .bank-logo {
+            height: 2.5rem;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .bank-option:hover .bank-logo {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -968,17 +1005,64 @@
             }
 
             function updateBankOptions() {
-                const banks = ['BCA', 'Mandiri', 'BNI', 'BRI', 'CIMB Niaga'];
-                const logos = { 'BCA': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png', 'Mandiri': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/2560px-Bank_Mandiri_logo_2016.svg.png', 'BNI': 'https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png', 'BRI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/1280px-BANK_BRI_logo.svg.png', 'CIMB Niaga': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Bank_CIMB_Niaga_logo.svg/2560px-Bank_CIMB_Niaga_logo.svg.png' };
-                $('#bank-options').empty();
-                banks.forEach(bank => {
-                    const active = bank === selectedBank ? 'ring-2 ring-blue-500 bg-blue-50' : 'bg-white border-gray-200';
-                    $('#bank-options').append(`<div class="cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition-all bank-option ${active}" data-bank="${bank}"><img src="${logos[bank]}" class="h-8 object-contain mb-3"><span class="font-medium text-gray-700">${bank}</span></div>`);
+                const provinceTextRaw = $('#province option:selected').text();
+                const cityTextRaw = $('#city option:selected').text();
+                const provinceText = (provinceTextRaw || '').toLowerCase().trim();
+                const cityText = (cityTextRaw || '').toLowerCase().trim();
+                const locationText = cityText || provinceText;
+                const bankOptionsContainer = $('#bank-options');
+
+                const bankLogosMap = {
+                    'Mandiri': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Bank_Mandiri_logo.svg/222px-Bank_Mandiri_logo.svg.png?20161029145158',
+                    'BNI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Wondr_by_BNI.svg/250px-Logo_Wondr_by_BNI.svg.png',
+                    'BRI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png',
+                    'BSI': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png',
+                    'OCBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Logo-ocbc.svg/512px-Logo-ocbc.svg.png'
+                };
+
+                let availableBanks = [];
+
+                if (!locationText || locationText.startsWith('-- pilih')) {
+                    bankOptionsContainer.html(
+                        '<p class="text-sm text-gray-500 col-span-full">Silakan pilih lokasi terlebih dahulu.</p>'
+                    );
+                    return;
+                }
+
+                if (locationText.includes('makassar') || locationText.includes('gowa') || locationText.includes('maros')) {
+                    availableBanks = ['Mandiri', 'BNI', 'BRI', 'BSI'];
+                } else if (locationText.includes('jakarta') || locationText.includes('bogor') ||
+                    locationText.includes('depok') || locationText.includes('tangerang') || locationText.includes(
+                        'tangerang selatan')) {
+                    availableBanks = ['Mandiri'];
+                } else if (locationText.includes('bekasi') || provinceText.includes('jawa barat')) {
+                    availableBanks = ['BNI'];
+                } else if (locationText) {
+                    availableBanks = ['OCBC'];
+                }
+
+                bankOptionsContainer.empty();
+                availableBanks.forEach(bank => {
+                    const bankOption = $(`
+                        <div class="bank-option" data-bank="${bank}">
+                            <div class="flex items-center justify-center p-4">
+                                <img src="${bankLogosMap[bank]}" alt="${bank}" class="bank-logo">
+                            </div>
+                            <div class="text-center mt-2">
+                                <p class="font-medium text-gray-900">${bank}</p>
+                            </div>
+                        </div>
+                    `);
+                    bankOptionsContainer.append(bankOption);
                 });
-                $('.bank-option').click(function () {
-                    $('.bank-option').removeClass('ring-2 ring-blue-500 bg-blue-50').addClass('bg-white border-gray-200');
-                    $(this).removeClass('bg-white border-gray-200').addClass('ring-2 ring-blue-500 bg-blue-50');
-                    selectedBank = $(this).data('bank'); $('#selected_bank').val(selectedBank);
+
+                // Add click event to bank options
+                $('.bank-option').on('click', function () {
+                    $('.bank-option').removeClass('selected');
+                    $(this).addClass('selected');
+                    selectedBank = $(this).data('bank');
+                    $('#selected_bank').val(selectedBank);
+                    $('#selected_bank-error').hide();
                 });
             }
 
